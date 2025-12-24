@@ -1,0 +1,85 @@
+module Pestle::Grammar
+  # Pest grammar tokenizer.
+  class Lexer
+    @grammar: String
+
+    @scanner: StringScanner
+
+    # Start of the current token as a byte index into grammar.
+    @start: Integer
+
+    # Tokens are arrays of (kind, value, start index).
+    # Sometimes we set value to `nil` when the symbol is unambiguous.
+    @tokens: Array[[Symbol, String?, Integer]]
+
+    attr_reader tokens: Array[[Symbol, String?, Integer]]
+
+    RE_WHITESPACE: ::Regexp
+
+    RE_LINE_COMMENT: ::Regexp
+
+    RE_BLOCK_COMMENT_START: ::Regexp
+
+    RE_BLOCK_COMMENT_END: ::Regexp
+
+    RE_BLOCK_COMMENT_CHUNK: ::Regexp
+
+    RE_GRAMMAR_DOC: ::Regexp
+
+    RE_RULE_DOC: ::Regexp
+
+    RE_IDENT: ::Regexp
+
+    RE_TAG: ::Regexp
+
+    RE_PUSH_LITERAL: ::Regexp
+
+    RE_PUSH: ::Regexp
+
+    RE_PEEK: ::Regexp
+
+    RE_PEEK_ALL: ::Regexp
+
+    RE_POP: ::Regexp
+
+    RE_POP_ALL: ::Regexp
+
+    RE_DROP: ::Regexp
+
+    RE_CHAR: ::Regexp
+
+    RE_INTEGER: ::Regexp
+
+    RE_RANGE_OP: ::Regexp
+
+    RE_NUMBER: ::Regexp
+
+    def self.tokenize: (String grammar) -> Array[[Symbol, String?, Integer]]
+
+    def initialize: (String grammar) -> void
+
+    def run: () -> void
+
+    def skip?: (Regexp regex) -> (true | false)
+
+    def skip_block_comment?: () -> (true | false)
+
+    def skip_trivia: () -> untyped
+
+    def lex_grammar: () -> void
+
+    def lex_rules: () -> void
+                
+    def accept_expression: () -> void
+                         
+    def accept_term: () -> void
+                   
+    def accept_terminal?: () -> bool
+                       
+    def accept_postfix_op: () -> void
+                         
+    def accept_string_literal?: () -> bool
+                             
+    def accept_ci_string_literal?: () -> bool
+  end
+end
