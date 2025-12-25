@@ -1,0 +1,3 @@
+class StringScanner
+  def scan_byte: () -> Integer?
+end

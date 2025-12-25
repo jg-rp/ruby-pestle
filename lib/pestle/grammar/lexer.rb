@@ -265,6 +265,7 @@ module Pestle::Grammar
         skip_trivia
         raise "expected an opening parenthesis" unless @scanner.scan_byte == 40 # (
 
+        @tokens << [:token_l_paren, nil, @start]
         @start = @scanner.pos
         skip_trivia
         accept_expression
@@ -272,6 +273,7 @@ module Pestle::Grammar
         skip_trivia
         raise "expected an opening parenthesis" unless @scanner.scan_byte == 41 # )
 
+        @tokens << [:token_r_paren, nil, @start]
         return true
       end
 
@@ -311,7 +313,7 @@ module Pestle::Grammar
         @start = @scanner.pos
 
         if (value = @scanner.scan(RE_INTEGER))
-          @tokens << [:token_INTEGER, value, @start]
+          @tokens << [:token_integer, value, @start]
           @start = @scanner.pos
         end
 
@@ -321,7 +323,7 @@ module Pestle::Grammar
         @start = @scanner.pos
 
         if (value = @scanner.scan(RE_INTEGER))
-          @tokens << [:token_INTEGER, value, @start]
+          @tokens << [:token_integer, value, @start]
           @start = @scanner.pos
         end
 
@@ -391,7 +393,7 @@ module Pestle::Grammar
             @tokens << [:token_comma, nil, @start]
             @start = @scanner.pos
           elsif (value = @scanner.scan(RE_NUMBER))
-            @tokens << [:token_comma, value, @start]
+            @tokens << [:token_number, value, @start]
             @start = @scanner.pos
           else
             break
@@ -400,6 +402,9 @@ module Pestle::Grammar
 
         skip_trivia
         raise "expected a closing brace" unless @scanner.scan_byte == 125
+
+        @tokens << [:token_r_brace, nil, @start]
+        @start = @scanner.pos
       end
     end
 
