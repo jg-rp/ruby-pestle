@@ -1,0 +1,11 @@
+module Pestle::Grammar
+  class Identifier < Terminal
+    @value: String
+
+    attr_reader value: String
+
+    def initialize: (String value, ?tag: String?) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+end

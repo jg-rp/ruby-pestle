@@ -1,0 +1,26 @@
+module Pestle::Grammar
+  class Rule < Expression
+    @name: String
+
+    @expression: Expression
+
+    @modifier: Symbol?
+
+    @doc: String?
+
+    attr_reader name: String
+
+    attr_reader modifier: Symbol?
+
+    attr_reader doc: String?
+
+    def initialize: (String name, Expression expression, ?modifier: Symbol?, ?doc: String?) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  
+    def children: () -> ::Array[Expression]
+  end
+
+  class BuiltInRule < Rule
+  end
+end

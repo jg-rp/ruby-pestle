@@ -1,0 +1,4 @@
+module Pestle
+  class Pair
+  end
+end

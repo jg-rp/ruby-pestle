@@ -1,0 +1,57 @@
+module Pestle::Grammar
+  class PushLiteral < Terminal
+    @value: String
+
+    attr_reader value: String
+
+    def initialize: (String value, ?tag: String?) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+
+  class Push < Expression
+    @expression: Expression
+
+    attr_reader expression: Expression
+
+    def initialize: (Expression expression, ?tag: String?) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> ::Array[Expression]
+  end
+
+  class PeekSlice < Terminal
+    @start: Integer
+
+    @stop: Integer
+
+    attr_reader start: Integer
+
+    attr_reader stop: Integer
+
+    def initialize: (Integer start, Integer stop, ?tag: String?) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+
+  class Peek < Terminal
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+
+  class PeekAll < Terminal
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+
+  class Pop < Terminal
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+
+  class PopAll < Terminal
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+
+  class Drop < Terminal
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+end

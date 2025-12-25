@@ -1,0 +1,4 @@
+module Pestle
+  class ParserState
+  end
+end

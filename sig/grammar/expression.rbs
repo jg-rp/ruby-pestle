@@ -1,0 +1,19 @@
+module Pestle::Grammar
+  # Base class for all grammar expressions.
+  class Expression
+    @tag: String?
+
+    attr_reader tag: String?
+
+    def initialize: (?tag: String?) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> Array[Expression]
+  end
+
+  # Base class for terminal expressions (those without children).
+  class Terminal < Expression
+    def children: () -> ::Array[Expression]
+  end
+end

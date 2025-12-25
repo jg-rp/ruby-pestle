@@ -1,0 +1,14 @@
+module Pestle::Grammar
+  # The sequence operator `~`.
+  class Sequence < Expression
+    @expressions: Array[Expression]
+
+    attr_reader expressions: Array[Expression]
+
+    def initialize: (*Expression expressions) -> void
+                  
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> Array[Expression]
+  end
+end

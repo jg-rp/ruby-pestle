@@ -1,0 +1,16 @@
+module Pestle::Grammar
+  class Range < Terminal
+    @start: Integer
+
+    @stop: Integer
+
+    attr_reader start: Integer
+
+    attr_reader stop: Integer
+
+    def initialize: (Integer start, Integer stop, ?tag: String?) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+end
+

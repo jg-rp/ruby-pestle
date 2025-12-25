@@ -1,0 +1,112 @@
+module Pestle::Grammar
+  # An optional expression `<expression>?`.
+  class Optional < Expression
+    @expression: Expression
+
+    attr_reader expression: Expression
+
+    def initialize: (Expression expression) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> ::Array[Expression]
+  end
+
+  # An expression repeated zero or more times `<expression>*`.
+  class Repeat < Expression
+    @expression: Expression
+
+    attr_reader expression: Expression
+
+    def initialize: (Expression expression) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> ::Array[Expression]
+  end
+
+  # An expression repeated one or more times `<expression>+`.
+  class RepeatOnce < Expression
+    @expression: Expression
+
+    attr_reader expression: Expression
+
+    def initialize: (Expression expression) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> ::Array[Expression]
+  end
+
+  # An expression repeated a specified number of times `<expression>{n}`.
+  class RepeatExact < Expression
+    @expression: Expression
+
+    @number: Integer
+
+    attr_reader expression: Expression
+
+    attr_reader number: Integer
+
+    def initialize: (Expression expression, Integer number) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> ::Array[Expression]
+  end
+
+  # An expression repeated at least specified number of times `<expression>{n,}`.
+  class RepeatMin < Expression
+    @expression: Expression
+
+    @number: Integer
+
+    attr_reader expression: Expression
+
+    attr_reader number: Integer
+
+    def initialize: (Expression expression, Integer number) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> ::Array[Expression]
+  end
+
+  # An expression repeated at most specified number of times `<expression>{,n}`.
+  class RepeatMax < Expression
+    @expression: Expression
+
+    @number: Integer
+
+    attr_reader expression: Expression
+
+    attr_reader number: Integer
+
+    def initialize: (Expression expression, Integer number) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> ::Array[Expression]
+  end
+
+  # An expression repeated a specified range of times `<expression>{n,m}`.
+  class RepeatMinMax < Expression
+    @expression: Expression
+
+    @min: Integer
+
+    @max: Integer
+
+    attr_reader expression: Expression
+
+    attr_reader min: Integer
+
+    attr_reader max: Integer
+
+    def initialize: (Expression expression, Integer min, Integer max) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> ::Array[Expression]
+  end
+end

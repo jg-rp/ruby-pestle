@@ -1,0 +1,14 @@
+module Pestle::Grammar
+  # The choice operator `|`.
+  class Choice < Expression
+    @expressions: Array[Expression]
+
+    attr_reader expressions: Array[Expression]
+
+    def initialize: (*Expression expressions) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> Array[Expression]
+  end
+end
