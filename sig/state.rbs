@@ -57,5 +57,7 @@ module Pestle
     def stack_peek_slice: (Integer? start, Integer? stop) -> Array[String]?
 
     def parse_trivia: (Array[Pestle::Pair] pairs) -> bool
+                    
+    def with_tag: (String name) { () -> untyped } -> untyped
   end
 end

@@ -108,5 +108,11 @@ module Pestle
       # TODO:
       raise "not implemented"
     end
+
+    def with_tag(name)
+      @tags << name
+      yield
+      @tags.pop
+    end
   end
 end

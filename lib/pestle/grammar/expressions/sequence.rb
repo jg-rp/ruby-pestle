@@ -11,8 +11,16 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      children = [] # : Array[Pestle::Pair]
+
+      @expression.each_with_index do |expr, i|
+        return false unless expr.parse(state, children)
+
+        state.parse_trivia(children) if i < @expressions.length - 1
+      end
+
+      pairs.concat(children)
+      true
     end
 
     def children = @expressions

@@ -10,8 +10,12 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      unless @tag.nil?
+        state.with_tag(@tag || raise) do
+          return state.rules[@value].parse(state, pairs)
+        end
+      end
+      state.rules[@value].parse(state, pairs)
     end
   end
 end
