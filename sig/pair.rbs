@@ -1,4 +1,162 @@
 module Pestle
+  class Token
+    @rule: Grammar::Rule
+
+    @pos: Integer
+
+    attr_reader rule: Grammar::Rule
+
+    attr_reader pos: Integer
+
+    def initialize: (Grammar::Rule rule, Integer pos) -> void
+  end
+
+  class Start < Token
+    def to_s: () -> ::String
+  end
+
+  class End < Token
+    def to_s: () -> ::String
+  end
+
+  class Span
+    @text: String
+
+    @start: Integer
+
+    @end: Integer
+
+    attr_reader text: String
+
+    attr_reader start: Integer
+
+    attr_reader end: Integer
+
+    def initialize: (String text, Integer start, Integer stop) -> void
+
+    def to_s: () -> String
+
+    def start_pos: () -> Position
+
+    def end_pos: () -> Position
+
+    # Return an array of lines covered by this span.
+    def lines: () -> Array[String]
+  end
+
+  class Position
+    @text: String
+
+    @pos: Integer
+
+    attr_reader text: String
+
+    attr_reader pos: Integer
+
+    def initialize: (String text, Integer pos) -> void
+
+    def line_col: () -> [Integer, Integer]
+
+    def line_of: () -> String
+  end
+
   class Pair
+    @source: String
+
+    @start: Integer
+
+    @end: Integer
+
+    @rule: Grammar::Rule
+
+    @children: Array[Pair]
+
+    @tag: String?
+
+    @name: String
+
+    attr_reader start: Integer
+
+    attr_reader end: Integer
+
+    attr_reader rule: Grammar::Rule
+
+    attr_reader tag: String?
+
+    attr_reader name: String
+
+    def initialize: (String source, Integer start, Integer stop, Grammar::Rule rule, Array[Pair] children, ?tag: untyped?) -> void
+
+    def deconstruct: () -> Array[untyped]
+                   
+    def deconstruct_keys: (untyped keys) -> Hash[Symbol, untyped]
+
+    def to_s: () -> String
+
+    def each: () ?{ (?) -> untyped } -> untyped
+
+    def inner: () -> Pairs
+
+    def stream: () -> Stream
+
+    def tokens: () -> Enumerable[Token]
+
+    def span: () -> Span
+
+    def dump: () -> Hash[String, untyped]
+
+    def dumps: (?indent: ::Integer, ?new_line: bool) -> String
+
+    def line_col: () -> [Integer, Integer]
+
+    def text: () -> String
+
+    def inner_texts: () -> Array[String]
+  end
+
+  class Pairs
+    @pairs: Array[Pair]
+
+    def initialize: (Array[Pair] pairs) -> void
+
+    def each: () ?{ (?) -> untyped } -> untyped
+
+    def length: () -> Integer
+
+    def tokens: () -> Enumerable[Token]
+
+    def stream: () -> Stream
+
+    def dump: () -> Array[untyped]
+
+    def dumps: (?compact: bool) -> String
+
+    def flatten: () -> Enumerable[Pair]
+
+    def first: () -> Pair
+
+    def find_first_tagged: (String label) -> (Pair | nil)
+
+    def find_tagged: (String label) -> Enumerable[Pair]
+  end
+
+  # Step through pairs of tokens.
+  class Stream
+    @pairs: Array[Pair]
+
+    @pos: Integer
+
+    attr_accessor pos: Integer
+
+    def initialize: (Array[Pair] pairs) -> void
+
+    # Consume and return the next pair, or nil if we're at the end of the stream.
+    def next: () -> Pair?
+
+    # Go back one position. This is a no-op if we're at the beginning of the stream.
+    def backup: () -> void
+
+    # Return the next pair without consuming it, or nil if we're at the end of the stream.
+    def peek: () -> Pair?
   end
 end

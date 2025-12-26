@@ -6,6 +6,7 @@ target :lib do
   signature "sig"
   check "lib"
 
+  library "json"
   library "strscan"
 
   # configure_code_diagnostics(D::Ruby.default)      # `default` diagnostics setting

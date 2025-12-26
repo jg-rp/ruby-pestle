@@ -1,4 +1,61 @@
 module Pestle
   class ParserState
+    @text: String
+
+    @scanner: StringScanner
+
+    @rules: Hash[String, Pestle::Grammar::Rule]
+
+    @pos: Integer
+
+    @pos_checkpoints: Array[Integer]
+
+    @atomic_depth: Integer
+
+    @atomic_depth_checkpoints: Array[Integer]
+
+    @tags: Array[String]
+
+    @user_stack: Array[String]
+
+    @user_stack_popped: Array[String]
+
+    @user_stack_lengths: Array[[Integer, Integer]]
+
+    attr_reader text: String
+
+    attr_reader scanner: StringScanner
+
+    attr_reader rules: Hash[String, Pestle::Grammar::Rule]
+
+    attr_reader atomic_depth: Integer
+
+    attr_accessor pos: Integer
+
+    def initialize: (String text, Hash[String, Pestle::Grammar::Rule] rules, ?start_pos: ::Integer) -> void
+
+    def checkpoint: () -> void
+
+    def ok: () -> void
+
+    def restore: () -> void
+
+    def stack_snapshot: () -> void
+
+    def stack_drop_snapshot: () -> void
+
+    def stack_restore: () -> void
+
+    def stack_empty?: () -> bool
+
+    def stack_push: (String value) -> void
+
+    def stack_pop: () -> String?
+
+    def stack_peek: () -> String?
+
+    def stack_peek_slice: (Integer? start, Integer? stop) -> Array[String]?
+
+    def parse_trivia: (Array[Pestle::Pair] pairs) -> bool
   end
 end

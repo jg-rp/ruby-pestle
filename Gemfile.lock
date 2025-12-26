@@ -129,6 +129,7 @@ PLATFORMS
 
 DEPENDENCIES
   benchmark-ips (~> 2.14)
+  json (~> 2.18)
   minitest (~> 6.0)
   rake (~> 13.3)
   rubocop (~> 1.82)

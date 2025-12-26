@@ -12,3 +12,5 @@ gem "rubocop-minitest", "~> 0.38.2"
 gem "rubocop-performance", "~> 1.26"
 gem "rubocop-rake", "~> 0.7.1"
 gem "steep", "~> 1.10"
+
+gem "json", "~> 2.18"
