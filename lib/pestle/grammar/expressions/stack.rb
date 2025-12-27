@@ -9,9 +9,9 @@ module Pestle::Grammar
       @value = value
     end
 
-    def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+    def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
+      state.stack_push(@value)
+      true
     end
   end
 
@@ -24,8 +24,16 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      start_byte_pos = state.scanner.byte_pos
+      children = [] # : Array[Pestle::Pair]
+
+      if @expression.parse(state, children)
+        pairs.concat(children)
+        state.stack_push(state.text[start_byte_pos...state.scanner.byte_pos] || raise)
+        true
+      else
+        false
+      end
     end
 
     def children = [@expression]
@@ -40,44 +48,84 @@ module Pestle::Grammar
       @stop = stop
     end
 
-    def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+    def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
+      start_pos = state.scanner.pos
+      state.stack_peek_slice(@start, @stop).each do |s|
+        if state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
+          state.scanner.pos = start_pos
+          return false
+        end
+      end
+
+      true
     end
   end
 
   class Peek < Terminal
-    def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+    def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
+      peeked = state.stack_peek
+      return false if peeked.nil?
+
+      !state.scanner.scan(peeked).nil? # steep:ignore ArgumentTypeMismatch
     end
   end
 
   class PeekAll < Terminal
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      start_pos = state.scanner.pos
+      children = [] # : Array[Pestle::Pair]
+
+      state.user_stack.reverse_each.with_index do |s, i|
+        if state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
+          state.scanner.pos = start_pos
+          return false
+        end
+
+        state.parse_trivia(children) if i < state.user_stack.length
+      end
+
+      pairs.concat(children)
+      true
     end
   end
 
   class Pop < Terminal
-    def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+    def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
+      peeked = state.stack_peek
+      return false if peeked.nil?
+
+      if state.scanner.scan(peeked).nil? # steep:ignore ArgumentTypeMismatch
+        false
+      else
+        state.stack_pop
+        true
+      end
     end
   end
 
   class PopAll < Terminal
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      start_pos = state.scanner.pos
+      children = [] # : Array[Pestle::Pair]
+
+      state.user_stack.reverse_each.with_index do |s, i|
+        if state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
+          state.scanner.pos = start_pos
+          return false
+        end
+
+        state.parse_trivia(children) if i < state.user_stack.length
+      end
+
+      state.stack_clear
+      pairs.concat(children)
+      true
     end
   end
 
   class Drop < Terminal
-    def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+    def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
+      !state.stack_pop.nil?
     end
   end
 end

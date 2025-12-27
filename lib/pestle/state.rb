@@ -3,15 +3,14 @@
 module Pestle
   # Pest parser state.
   class ParserState
-    attr_reader :text, :scanner, :rules, :atomic_depth
+    attr_reader :text, :scanner, :rules, :atomic_depth, :user_stack
     attr_accessor :pos
 
     def initialize(text, rules, start_pos: 0)
       @text = text
-      @scanner = StringScanner.new(text)
       @rules = rules
 
-      @pos = start_pos
+      @scanner = StringScanner.new(text)
       @pos_checkpoints = [] # : Array[Integer]
 
       @atomic_depth = 0
@@ -27,7 +26,7 @@ module Pestle
     def checkpoint
       stack_snapshot
       @atomic_depth_checkpoints << @atomic_depth
-      @pos_checkpoints << @atomic_depth
+      @pos_checkpoints << @scanner.pos
     end
 
     def ok
@@ -39,7 +38,7 @@ module Pestle
     def restore
       stack_restore
       @atomic_depth = @atomic_depth_checkpoints.pop || raise
-      @pos = @pos_checkpoints.pop || raise
+      @scanner.pos = @pos_checkpoints.pop || raise
     end
 
     def stack_snapshot
@@ -101,7 +100,22 @@ module Pestle
     end
 
     def stack_peek_slice(start, stop)
-      @user_stack[(start || 0)...(stop || @user_stack.length)]
+      @user_stack[(start || 0)...(stop || @user_stack.length)] || []
+    end
+
+    def stack_clear
+      return unless @user_stack.empty?
+
+      removed = @user_stack.dup
+      @user_stack.clear
+
+      if @user_stack_lengths.empty?
+        @user_stack_popped.clear
+        @user_stack_lengths.clear
+      else
+        @user_stack_lengths.last[1] = 0
+        @user_stack_popped.concat(removed.reverse!)
+      end
     end
 
     def parse_trivia(pairs)

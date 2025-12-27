@@ -1,0 +1,25 @@
+module Pestle::Grammar
+  class StringLiteral < Terminal
+    @value: ::String
+
+    @re: Regexp
+
+    attr_reader value: ::String
+
+    def initialize: (::String value, ?tag: ::String?) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+
+  class InsensitiveString < Terminal
+    @value: ::String
+
+    @re: Regexp
+
+    attr_reader value: ::String
+
+    def initialize: (::String value, ?tag: ::String?) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+end

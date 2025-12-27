@@ -65,8 +65,33 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      children = [] # : Array[Pestle::Pair]
+
+      state.checkpoint
+      if @expression.parse(state, children)
+        state.ok
+        pairs.concat(children)
+        children.clear
+        state.parse_trivia(children)
+      else
+        state.restore
+        return false
+      end
+
+      loop do
+        state.checkpoint
+        if @expression.parse(state, children)
+          state.ok
+          pairs.concat(children)
+          children.clear
+          state.parse_trivia(children)
+        else
+          state.restore
+          break
+        end
+      end
+
+      true
     end
 
     def children = [@expression]
@@ -83,8 +108,30 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      return true if @number.zero?
+
+      children = [] # : Array[Pestle::Pair]
+      count = 0
+
+      state.checkpoint
+
+      loop do
+        state.parse_trivia(children)
+        break unless @expression.parse(state, children)
+
+        count += 1
+
+        break if count == @number
+      end
+
+      if count == @number
+        pairs.concat(children)
+        state.ok
+        true
+      else
+        state.restore
+        false
+      end
     end
 
     def children = [@expression]
@@ -101,8 +148,28 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      return true if @number.zero?
+
+      children = [] # : Array[Pestle::Pair]
+      count = 0
+
+      state.checkpoint
+
+      loop do
+        state.parse_trivia(children)
+        break unless @expression.parse(state, children)
+
+        count += 1
+      end
+
+      if count >= @number
+        pairs.concat(children)
+        state.ok
+        true
+      else
+        state.restore
+        false
+      end
     end
 
     def children = [@expression]
@@ -119,8 +186,25 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      return true if @number.zero?
+
+      children = [] # : Array[Pestle::Pair]
+      count = 0
+
+      state.checkpoint
+
+      loop do
+        state.parse_trivia(children)
+        break unless @expression.parse(state, children)
+
+        count += 1
+
+        break if count == @number
+      end
+
+      pairs.concat(children)
+      state.ok
+      true
     end
 
     def children = [@expression]
@@ -138,8 +222,30 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      return true if @number.zero?
+
+      children = [] # : Array[Pestle::Pair]
+      count = 0
+
+      state.checkpoint
+
+      loop do
+        state.parse_trivia(children)
+        break unless @expression.parse(state, children)
+
+        count += 1
+
+        break if count == @max
+      end
+
+      if count.between?(@min, @max)
+        pairs.concat(children)
+        state.ok
+        true
+      else
+        state.restore
+        false
+      end
     end
 
     def children = [@expression]

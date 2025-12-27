@@ -6,8 +6,6 @@ module Pestle
 
     @rules: Hash[String, Pestle::Grammar::Rule]
 
-    @pos: Integer
-
     @pos_checkpoints: Array[Integer]
 
     @atomic_depth: Integer
@@ -30,7 +28,7 @@ module Pestle
 
     attr_reader atomic_depth: Integer
 
-    attr_accessor pos: Integer
+    attr_reader user_stack: Array[String]
 
     def initialize: (String text, Hash[String, Pestle::Grammar::Rule] rules, ?start_pos: ::Integer) -> void
 
@@ -54,7 +52,9 @@ module Pestle
 
     def stack_peek: () -> String?
 
-    def stack_peek_slice: (Integer? start, Integer? stop) -> Array[String]?
+    def stack_peek_slice: (Integer? start, Integer? stop) -> Array[String]
+                        
+    def stack_clear: () -> void
 
     def parse_trivia: (Array[Pestle::Pair] pairs) -> bool
                     

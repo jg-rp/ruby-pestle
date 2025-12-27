@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Pestle::Grammar
+  # An expression matching a single character from a continuous range.
   class Range < Terminal
     attr_reader :start, :stop
 
@@ -8,11 +9,11 @@ module Pestle::Grammar
       super(tag: tag)
       @start = start
       @stop = stop
+      @re = /[#{Regexp.escape(start)}-#{Regexp.escape(stop)}]/o
     end
 
-    def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+    def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
+      !state.scanner.scan(@re).nil?
     end
   end
 end

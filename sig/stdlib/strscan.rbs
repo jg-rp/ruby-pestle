@@ -1,3 +1,5 @@
 class StringScanner
+  attr_reader byte_pos: Integer
+  
   def scan_byte: () -> Integer?
 end

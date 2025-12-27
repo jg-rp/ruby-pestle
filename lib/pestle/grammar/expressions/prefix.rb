@@ -10,9 +10,8 @@ module Pestle::Grammar
       @expression = expression
     end
 
-    def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+    def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
+      @expression.parse(state, [])
     end
 
     def children = [@expression]
@@ -27,9 +26,11 @@ module Pestle::Grammar
       @expression = expression
     end
 
-    def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+    def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
+      state.checkpoint
+      matched = @expression.parse(state, [])
+      state.restore
+      !matched
     end
 
     def children = [@expression]
