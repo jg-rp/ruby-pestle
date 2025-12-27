@@ -24,12 +24,12 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      start_byte_pos = state.scanner.byte_pos
+      start_byte_pos = state.scanner.pos
       children = [] # : Array[Pestle::Pair]
 
       if @expression.parse(state, children)
         pairs.concat(children)
-        state.stack_push(state.text[start_byte_pos...state.scanner.byte_pos] || raise)
+        state.stack_push(state.text.byteslice(start_byte_pos...state.scanner.pos) || raise)
         true
       else
         false

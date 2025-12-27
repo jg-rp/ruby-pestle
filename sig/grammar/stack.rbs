@@ -22,15 +22,15 @@ module Pestle::Grammar
   end
 
   class PeekSlice < Terminal
-    @start: Integer
+    @start: Integer?
 
-    @stop: Integer
+    @stop: Integer?
 
-    attr_reader start: Integer
+    attr_reader start: Integer?
 
-    attr_reader stop: Integer
+    attr_reader stop: Integer?
 
-    def initialize: (Integer start, Integer stop, ?tag: String?) -> void
+    def initialize: (Integer? start, Integer? stop, ?tag: String?) -> void
 
     def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
   end

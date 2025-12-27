@@ -37,7 +37,7 @@ module Pestle
     end
 
     def to_s
-      @text[@start...@end] || raise
+      @text.byteslice(@start...@end) || raise
     end
 
     def start_pos
@@ -58,7 +58,7 @@ module Pestle
     end
   end
 
-  # A position in a string as a Unicode code point offset.
+  # A position in a string as a byte offset.
   # Provides utilities for determining line and column numbers.
   class Position
     attr_reader :text, :pos
@@ -119,7 +119,7 @@ module Pestle
     end
 
     def to_s
-      @source[@start...@end] || raise
+      @source.byteslice(@start...@end) || raise
     end
 
     def each(&block)
@@ -193,7 +193,7 @@ module Pestle
     end
 
     def text
-      @source[@start...@end] || raise
+      @source.byteslice(@start...@end) || raise
     end
 
     def inner_texts

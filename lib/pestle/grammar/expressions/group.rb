@@ -1,0 +1,19 @@
+# frozen_string_literal: true
+
+module Pestle::Grammar
+  # An expression surrounded by parentheses.
+  class Group < Expression
+    attr_reader :expression
+
+    def initialize(expression, tag: nil)
+      super(tag: tag)
+      @expression = expression
+    end
+
+    def parse(state, pairs)
+      @expression.parse(state, pairs)
+    end
+
+    def children = [@expression]
+  end
+end

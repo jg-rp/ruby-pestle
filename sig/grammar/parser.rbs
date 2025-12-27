@@ -39,6 +39,8 @@ module Pestle::Grammar
     def parse_infix_expression: (Expression left) -> Expression
 
     def parse_postfix_expression: (Expression expr) -> Expression
+                                
+    def parse_repeat_expression: (Expression expr) -> Expression
 
     def parse_peek_expression: (String? tag) -> Expression
   end

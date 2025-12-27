@@ -1,0 +1,5 @@
+module Pestle::Grammar
+  SLASH_U_ESCAPE_DIGITS: Array[Integer]
+
+  def self.unescape: (String value, [Symbol, String?, Integer] token) -> String
+end

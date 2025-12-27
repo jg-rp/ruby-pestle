@@ -5,11 +5,14 @@ module Pestle
   class ParserState
     attr_reader :text, :scanner, :rules, :user_stack, :tags, :atomic_depth
 
+    # @param text [String] Source text to be parse into token pairs.
+    # @param start_pos [Integer] A byte offset from which to start scanning `text`.
     def initialize(text, rules, start_pos: 0)
       @text = text
       @rules = rules
 
       @scanner = StringScanner.new(text)
+      @scanner.pos = start_pos
       @pos_checkpoints = [] # : Array[Integer]
 
       @atomic_depth = 0

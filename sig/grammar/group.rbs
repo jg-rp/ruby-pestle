@@ -1,0 +1,14 @@
+module Pestle::Grammar
+  # An expression surrounded by parentheses.
+  class Group < Expression
+    @expression: Expression
+
+    attr_reader expression: Expression
+
+    def initialize: (Expression expression, ?tag: String?) -> void
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+
+    def children: () -> ::Array[Expression]
+  end
+end

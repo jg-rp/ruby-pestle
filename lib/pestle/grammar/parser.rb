@@ -3,6 +3,7 @@
 require_relative "errors"
 require_relative "expression"
 require_relative "expressions/choice"
+require_relative "expressions/group"
 require_relative "expressions/identifier"
 require_relative "expressions/postfix"
 require_relative "expressions/prefix"
@@ -11,6 +12,7 @@ require_relative "expressions/sequence"
 require_relative "expressions/stack"
 require_relative "expressions/string"
 require_relative "rule"
+require_relative "unescape"
 
 module Pestle::Grammar
   # Pest grammar parser.
@@ -112,13 +114,14 @@ module Pestle::Grammar
       # @type var left: Expression
       left = case token.first
              when :token_string
-               StringLiteral.new(self.next[1] || raise)
+               StringLiteral.new(self.next[1] || raise, tag: tag)
              when :token_ci_string
-               InsensitiveString.new(self.next[1] || raise)
+               InsensitiveString.new(self.next[1] || raise, tag: tag)
              when :token_string_esc
-               StringLiteral.new(unescape(self.next[1] || raise))
+               StringLiteral.new(Pestle::Grammar.unescape(self.next[1] || raise, token), tag: tag)
              when :token_ci_string_esc
-               InsensitiveString.new(unescape(self.next[1] || raise))
+               InsensitiveString.new(Pestle::Grammar.unescape(self.next[1] || raise, token),
+                                     tag: tag)
              when :token_l_paren
                @pos += 1
                expr = Group.new(parse_expression(PREC_LOWEST), tag: tag)
@@ -151,9 +154,9 @@ module Pestle::Grammar
                @pos += 1
                PopAll.new(tag: tag)
              when :token_char
-               start = unescape_char(self.next[1] || raise)
+               start = Pestle::Grammar.unescape(self.next[1] || raise, token)
                eat(:token_range_op)
-               stop = unescape_char(eat(:token_char)[1] || raise)
+               stop = Pestle::Grammar.unescape(eat(:token_char)[1] || raise, token)
                Range.new(start, stop, tag: tag)
              when :token_pos_pred
                @pos += 1
@@ -179,18 +182,94 @@ module Pestle::Grammar
     end
 
     def parse_infix_expression(left)
-      # TODO:
-      raise "not implemented"
+      token = self.next
+      kind = token.first
+      precedence = PRECEDENCES[kind] || PREC_LOWEST
+      right = parse_expression(precedence)
+
+      case kind
+      when :token_choice_op
+        if right.is_a?(Choice)
+          Choice.new(left, *right.children)
+        else
+          Choice.new(left, right)
+        end
+      when :token_sequence_op
+        if right.is_a?(Choice)
+          Sequence.new(left, *right.children)
+        else
+          Sequence.new(left, right)
+        end
+      else
+        # TODO: PestGrammarSyntaxError
+        raise PestParsingError.new("unexpected operator #{kind}", token)
+      end
     end
 
     def parse_postfix_expression(expr)
-      # TODO:
-      raise "not implemented"
+      token = self.next
+      kind = token.first
+
+      case kind
+      when :token_optional_op
+        @pos += 1
+        Optional.new(expr)
+      when :token_repeat_op
+        @pos += 1
+        Repeat.new(expr)
+      when :token_repeat_once_op
+        @pos += 1
+        RepeatOnce.new(expr)
+      when :token_l_brace
+        @pos += 1
+        parse_repeat_expression(expr)
+      else
+        expr
+      end
+    end
+
+    def parse_repeat_expression(expr)
+      token = self.next
+      kind = token.first
+
+      if kind == :token_number
+        number = (token[1] || raise).to_i
+        if current.first == :token_r_brace
+          @pos += 1
+          return RepeatExact.new(expr, number)
+        end
+
+        eat(:token_comma)
+
+        if current.first == :token_r_brace
+          @pos += 1
+          return RepeatMin.new(expr, number)
+        end
+
+        stop = (eat(:token_number)[1] || raise).to_i
+        eat(:token_r_brace)
+        return RepeatMinMax.new(expr, number, stop)
+      end
+
+      if kind == :token_comma
+        number = (eat(:token_number)[1] || raise).to_i
+        eat(:token_r_brace)
+        return RepeatMax.new(expr, number)
+      end
+
+      # TODO: PestGrammarSyntaxError
+      raise PestParsingError.new("expected a number or a comma", token)
     end
 
     def parse_peek_expression(tag)
-      # TODO:
-      raise "not implemented"
+      return Peek.new(tag: tag) unless current.first == :token_l_bracket
+
+      self.next
+      start = ((self.next[1] || raise).to_i if current.first == :token_integer)
+      eat(:token_range_op)
+      stop = ((self.next[1] || raise).to_i if current.first == :token_integer)
+      eat(:token_r_bracket)
+      PeekSlice.new(start, stop, tag: tag)
     end
   end
 end
