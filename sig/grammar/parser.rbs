@@ -1,0 +1,45 @@
+module Pestle::Grammar
+  # Pest grammar parser.
+  class Parser
+    @tokens: Array[[Symbol, String?, Integer]]
+
+    @pos: Integer
+
+    @eof: [Symbol, String?, Integer]
+
+    PREC_LOWEST: Integer
+    PREC_CHOICE: Integer
+    PREC_SEQUENCE: Integer
+    PREC_PREFIX: Integer
+
+    PRECEDENCES: Hash[Symbol, Integer]
+
+    def initialize: (Array[[Symbol, String?, Integer]] tokens) -> void
+
+    # Return the current token without advancing the pointer.
+    # An EOF token is returned if there are no tokens left.
+    def current: () -> [Symbol, String?, Integer]
+
+    # Consume and return the next token.
+    def next: () -> [Symbol, String?, Integer]
+
+    def peek: (?::Integer offset) -> [Symbol, String?, Integer]
+
+    # Consume the next token if its kind matches _kind_, raise an error if it does not.
+    def eat: (Symbol kind, ?String? message) -> [Symbol, String?, Integer]
+
+    def parse: () -> [Hash[String, Rule], String?]
+
+    def parse_rules: () -> Hash[String, Rule]
+
+    def parse_modifier: () -> Integer
+
+    def parse_expression: (Integer precedence) -> Expression
+
+    def parse_infix_expression: (Expression left) -> Expression
+
+    def parse_postfix_expression: (Expression expr) -> Expression
+
+    def parse_peek_expression: (String? tag) -> Expression
+  end
+end

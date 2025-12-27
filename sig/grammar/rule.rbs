@@ -4,17 +4,31 @@ module Pestle::Grammar
 
     @expression: Expression
 
-    @modifier: Symbol?
+    @modifier: Integer
 
     @doc: String?
 
     attr_reader name: String
 
-    attr_reader modifier: Symbol?
+    attr_reader modifier: Integer
 
     attr_reader doc: String?
 
-    def initialize: (String name, Expression expression, ?modifier: Symbol?, ?doc: String?) -> void
+    SILENT: Integer
+
+    ATOMIC: Integer
+
+    COMPOUND: Integer
+
+    NONATOMIC: Integer
+
+    SILENT_ATOMIC: Integer
+
+    SILENT_COMPOUND: Integer
+
+    SILENT_NONATOMIC: Integer
+
+    def initialize: (String name, Expression expression, ?modifier: Integer, ?doc: String?) -> void
 
     def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
   

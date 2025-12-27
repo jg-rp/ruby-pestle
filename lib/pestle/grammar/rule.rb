@@ -5,7 +5,16 @@ module Pestle::Grammar
   class Rule < Expression
     attr_reader :name, :modifier, :doc
 
-    def initialize(name, expression, modifier: nil, doc: nil)
+    SILENT = 1 << 0
+    ATOMIC = 1 << 1
+    COMPOUND = 1 << 2
+    NONATOMIC = 1 << 3
+
+    SILENT_ATOMIC = SILENT | ATOMIC
+    SILENT_COMPOUND = SILENT | COMPOUND
+    SILENT_NONATOMIC = SILENT | NONATOMIC
+
+    def initialize(name, expression, modifier: 0, doc: nil)
       super(tag: nil)
       @name = name
       @expression = expression
@@ -14,8 +23,50 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      # TODO:
-      raise "not implemented"
+      start_pos = state.scanner.pos
+      children = [] # : Array[Pestle::Pair]
+
+      # TODO: ensure COMMENT and WHITESPACE are atomic during parsing
+      matched = if @modifier.anybits?(ATOMIC | COMPOUND)
+                  state.atomic do
+                    @expression.parse(state, children)
+                  end
+                elsif @modifier.anybits?(NONATOMIC)
+                  state.nonatomic do
+                    @expression.parse(state, children)
+                  end
+                else
+                  @expression.parse(state, children)
+                end
+
+      return false unless matched
+
+      if @modifier.anybits?(SILENT)
+        pairs.concat(children)
+        return true
+      end
+
+      tag = state.tags.pop
+
+      if @modifier.anybits?(ATOMIC)
+        # @type var rule: Rule?
+        # steep:ignore:start
+        rule = if @expression.is_a?(Rule)
+                 @expression
+               elsif @expression.is_a?(Identifier)
+                 state.rules[@expression.value]
+               end
+        # steep:ignore:end
+
+        if rule.nil? || rule.modifier.nobits?(NONATOMIC | COMPOUND)
+          # Atomic rule silences children.
+          children = [] # : Array[Pestle::Pair]
+        end
+      end
+
+      pairs << Pestle::Pair.new(state.text, start_pos, state.scanner.pos, self, children, tag: tag)
+
+      true
     end
 
     def children = [@expression]

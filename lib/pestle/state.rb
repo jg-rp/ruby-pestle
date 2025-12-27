@@ -3,8 +3,7 @@
 module Pestle
   # Pest parser state.
   class ParserState
-    attr_reader :text, :scanner, :rules, :atomic_depth, :user_stack
-    attr_accessor :pos
+    attr_reader :text, :scanner, :rules, :user_stack, :tags, :atomic_depth
 
     def initialize(text, rules, start_pos: 0)
       @text = text
@@ -104,29 +103,75 @@ module Pestle
     end
 
     def stack_clear
-      return unless @user_stack.empty?
-
-      removed = @user_stack.dup
-      @user_stack.clear
+      return if @user_stack.empty?
 
       if @user_stack_lengths.empty?
         @user_stack_popped.clear
         @user_stack_lengths.clear
       else
         @user_stack_lengths.last[1] = 0
-        @user_stack_popped.concat(removed.reverse!)
+        @user_stack_popped.concat(@user_stack.reverse)
       end
+
+      @user_stack = []
     end
 
     def parse_trivia(pairs)
-      # TODO:
-      raise "not implemented"
+      # TODO: optimized SKIP rule
+      whitespace_rule = @rules["WHITESPACE"]
+      comment_rule = @rules["COMMENT"]
+
+      return false unless whitespace_rule || comment_rule
+
+      children = [] # : Array[Pestle::Pair]
+      some = false
+
+      # TODO: suppress failures
+      loop do
+        matched = false
+
+        unless whitespace_rule.nil?
+          if whitespace_rule.parse(self, children)
+            some = true
+            matched = true
+            pairs.concat(children)
+          end
+          children.clear
+        end
+
+        unless comment_rule.nil?
+          if comment_rule.parse(self, children)
+            some = true
+            matched = true
+            pairs.concat(children)
+          end
+          children.clear
+        end
+
+        break unless matched
+      end
+
+      some
     end
 
     def with_tag(name)
       @tags << name
       yield
       @tags.pop
+    end
+
+    def atomic
+      @atomic_depth_checkpoints << @atomic_depth
+      @atomic_depth += 1
+      yield
+      @atomic_depth = @atomic_depth_checkpoints.pop || raise
+    end
+
+    def nonatomic
+      @atomic_depth_checkpoints << @atomic_depth
+      @atomic_depth = 0
+      yield
+      @atomic_depth = @atomic_depth_checkpoints.pop || raise
     end
   end
 end
