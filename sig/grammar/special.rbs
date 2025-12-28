@@ -1,0 +1,39 @@
+module Pestle::Grammar
+  # A builtin rule matching any single Unicode character.
+  class Any < BuiltInRule
+    def initialize: () -> void
+  end
+
+  # A terminal expression matching any single Unicode character.
+  class AnyChar < Terminal
+    def to_s: () -> "ANY"
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+
+  # A builtin rule matching the start of the input string.
+  class SOI < BuiltInRule
+    def initialize: () -> void
+  end
+
+  # A terminal expression matching the start of the input string.
+  class StartOfInput < Terminal
+    def to_s: () -> "SOI"
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+
+  # A builtin rule matching the end of the input string.
+  class EOI < BuiltInRule
+    def initialize: () -> void
+  end
+
+  # A terminal expression matching the end of the input string.
+  class EndOfInput < Terminal
+    def to_s: () -> "EOI"
+            
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
+
+  SPECIAL_RULES: { "ANY" => Any, "SOI" => SOI, "EOI" => EOI }
+end

@@ -1,6 +1,6 @@
 module Pestle::Grammar
   # Pest grammar parsing error.
-  class PestParsingError < StandardError
+  class PestGrammarError < StandardError
     @token: [Symbol, String?, Integer] | nil
 
     @source: String?

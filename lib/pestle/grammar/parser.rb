@@ -52,7 +52,7 @@ module Pestle::Grammar
       token = self.next
 
       unless token.first == kind
-        raise PestParsingError.new(message || "unexpected #{token.first}", token)
+        raise PestGrammarError.new(message || "unexpected #{token.first}", token)
       end
 
       token
@@ -165,7 +165,7 @@ module Pestle::Grammar
                @pos += 1
                NegativePredicate.new(parse_expression(PREC_PREFIX), tag: tag)
              else
-               raise PestParsingError.new("unexpected token #{token.first}", token)
+               raise PestGrammarError.new("unexpected token #{token.first}", token)
              end
 
       left = parse_postfix_expression(left)
@@ -201,8 +201,7 @@ module Pestle::Grammar
           Sequence.new(left, right)
         end
       else
-        # TODO: PestGrammarSyntaxError
-        raise PestParsingError.new("unexpected operator #{kind}", token)
+        raise PestGrammarError.new("unexpected operator #{kind}", token)
       end
     end
 
@@ -257,8 +256,7 @@ module Pestle::Grammar
         return RepeatMax.new(expr, number)
       end
 
-      # TODO: PestGrammarSyntaxError
-      raise PestParsingError.new("expected a number or a comma", token)
+      raise PestGrammarError.new("expected a number or a comma", token)
     end
 
     def parse_peek_expression(tag)

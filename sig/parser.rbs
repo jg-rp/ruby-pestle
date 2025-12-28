@@ -1,0 +1,14 @@
+module Pestle
+  class Parser
+    @rules: Hash[String, Pestle::Grammar::Rule]
+
+    @doc: String?
+
+    # Parse a grammar definition and return a new parser for it.
+    def self.from_grammar: (String grammar) -> Parser
+
+    def initialize: (Hash[String, Pestle::Grammar::Rule] rules, String? doc) -> void
+
+    def parse: (String start_rule, String text, ?start_pos: ::Integer) -> Pairs
+  end
+end

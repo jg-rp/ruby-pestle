@@ -45,25 +45,24 @@ module Pestle::Grammar
         index += 1
 
         unless value.byteslice(index) == "{"
-          raise PestParsingError.new("expected an opening brace",
+          raise PestGrammarError.new("expected an opening brace",
                                      token)
         end
 
         index += 1
         closing_brace_index = value.index("}", index)
-        raise PestParsingError.new("unclosed escape sequence", token) if closing_brace_index.nil?
+        raise PestGrammarError.new("unclosed escape sequence", token) if closing_brace_index.nil?
 
         hex_digit_length = closing_brace_index - index
 
         unless SLASH_U_ESCAPE_DIGITS.include?(hex_digit_length)
-          raise PestParsingError.new("expected \\u{00}, \\u{0000} or \\u{000000}", token)
+          raise PestGrammarError.new("expected \\u{00}, \\u{0000} or \\u{000000}", token)
         end
 
         unescaped << value.byteslice(index...(index + hex_digit_length)).to_i(16).chr # steep:ignore
         index += (hex_digit_length + 1)
       else
-        # TODO: PestGrammarSyntaxError
-        raise PestParsingError.new("unknown escape sequence", token)
+        raise PestGrammarError.new("unknown escape sequence", token)
       end
 
       index += 1

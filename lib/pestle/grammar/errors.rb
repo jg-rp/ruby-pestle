@@ -2,7 +2,7 @@
 
 module Pestle::Grammar
   # Pest grammar parsing error.
-  class PestParsingError < StandardError
+  class PestGrammarError < StandardError
     attr_accessor :token, :source
 
     FULL_MESSAGE = ((RUBY_VERSION.split(".")&.map(&:to_i) <=> [3, 2, 0]) || -1) < 1

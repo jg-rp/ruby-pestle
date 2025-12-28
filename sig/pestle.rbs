@@ -1,3 +1,5 @@
 module Pestle
   VERSION: String
+
+  def self.parse_grammar: (String grammar) -> [Hash[String, Pestle::Grammar::Rule], String?]
 end

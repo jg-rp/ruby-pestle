@@ -1,0 +1,9 @@
+module Pestle::Grammar
+  class ASCIIRule < BuiltInRule
+    def initialize: (String name, *Array[String] ranges) -> void
+  end
+
+  ASCII_RULE_DEFS: Hash[String, Array[Array[String]]]
+
+  ASCII_RULES: Hash[String, BuiltInRule]
+end
