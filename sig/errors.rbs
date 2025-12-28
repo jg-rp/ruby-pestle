@@ -1,0 +1,5 @@
+module Pestle
+  # Pest parsing error.
+  class PestParsingError < StandardError
+  end
+end

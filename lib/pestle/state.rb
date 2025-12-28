@@ -120,6 +120,8 @@ module Pestle
     end
 
     def parse_trivia(pairs)
+      return false if @atomic_depth.positive?
+
       # TODO: optimized SKIP rule
       whitespace_rule = @rules["WHITESPACE"]
       comment_rule = @rules["COMMENT"]

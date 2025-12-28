@@ -42,19 +42,20 @@ module Pestle::Grammar
     def parse(state, pairs)
       start_pos = state.scanner.pos
       children = [] # : Array[Pestle::Pair]
+      matched = false
 
       # TODO: ensure COMMENT and WHITESPACE are atomic during parsing
-      matched = if @modifier.anybits?(ATOMIC | COMPOUND)
-                  state.atomic do
-                    @expression.parse(state, children)
-                  end
-                elsif @modifier.anybits?(NONATOMIC)
-                  state.nonatomic do
-                    @expression.parse(state, children)
-                  end
-                else
-                  @expression.parse(state, children)
-                end
+      if @modifier.anybits?(ATOMIC | COMPOUND)
+        state.atomic do
+          matched = @expression.parse(state, children)
+        end
+      elsif @modifier.anybits?(NONATOMIC)
+        state.nonatomic do
+          matched = @expression.parse(state, children)
+        end
+      else
+        matched = @expression.parse(state, children)
+      end
 
       return false unless matched
 

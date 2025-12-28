@@ -2,6 +2,7 @@
 
 require_relative "grammar/builtin_rules/ascii"
 require_relative "grammar/builtin_rules/special"
+require_relative "errors"
 require_relative "state"
 
 module Pestle
@@ -29,7 +30,7 @@ module Pestle
       return Pairs.new(pairs) if rule.parse(state, pairs)
 
       # TODO: error reporting with furthest rule
-      raise "parsing error"
+      raise(PestParsingError, "parsing error")
     end
 
     def tree_view

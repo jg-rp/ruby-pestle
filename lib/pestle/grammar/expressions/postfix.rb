@@ -16,15 +16,8 @@ module Pestle::Grammar
 
     def parse(state, pairs)
       children = [] # : Array[Pestle::Pair]
-      state.checkpoint
-      if @expression.parse(state, children)
-        state.ok
-        pairs.concat(children)
-        true
-      else
-        state.restore
-        false
-      end
+      pairs.concat(children) if @expression.parse(state, children)
+      true
     end
 
     def children = [@expression]
