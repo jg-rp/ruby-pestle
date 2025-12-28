@@ -2,6 +2,7 @@
 
 require_relative "grammar/builtin_rules/ascii"
 require_relative "grammar/builtin_rules/special"
+require_relative "state"
 
 module Pestle
   # A Pest parser.

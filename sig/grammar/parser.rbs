@@ -20,7 +20,8 @@ module Pestle::Grammar
 
     def initialize: (String source, Array[[Symbol, String?, Integer]] tokens) -> void
                   
-    SLASH_U_ESCAPE_DIGITS: Array[Integer]
+    RE_SLASH_X: Regexp
+    RE_SLASH_U: Regexp
 
     def unescape: (String value, [Symbol, String?, Integer] token) -> String
 
@@ -51,7 +52,6 @@ module Pestle::Grammar
     def parse_repeat_expression: (Expression expr) -> Expression
 
     def parse_peek_expression: (String? tag) -> Expression
-    
     
   end
 end

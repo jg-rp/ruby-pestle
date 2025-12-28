@@ -9,7 +9,7 @@ module Pestle::Grammar
       super(tag: tag)
       @start = start
       @stop = stop
-      @re = /[#{Regexp.escape(start)}-#{Regexp.escape(stop)}]/o
+      @re = /[#{Regexp.escape(start)}-#{Regexp.escape(stop)}]/
     end
 
     def to_s

@@ -8,7 +8,7 @@ module Pestle::Grammar
     def initialize(value, tag: nil)
       super(tag: tag)
       @value = value
-      @re = /#{Regexp.escape(value)}/o
+      @re = /#{Regexp.escape(value)}/
     end
 
     def to_s
@@ -27,7 +27,7 @@ module Pestle::Grammar
     def initialize(value, tag: nil)
       super(tag: tag)
       @value = value
-      @re = /#{Regexp.escape(value)}/io
+      @re = /#{Regexp.escape(value)}/i
     end
 
     def to_s

@@ -98,7 +98,7 @@ module Pestle::Grammar
       when :token_mod_compound
         @pos += 1
         1 << 2
-      when :token_mod_nonatomic
+      when :token_mod_non_atomic
         @pos += 1
         1 << 3
       else
@@ -110,7 +110,12 @@ module Pestle::Grammar
       # Skip leading choice operator
       self.next if current.first == :token_choice_op
 
-      tag = (self.next[1] if current.first == :token_tag)
+      tag = if current.first == :token_tag
+              tag_tok = self.next
+              eat(:token_assign_op)
+              tag_tok[1]
+            end
+
       token = current
 
       # @type var left: Expression
@@ -135,7 +140,7 @@ module Pestle::Grammar
              when :token_push_literal
                @pos += 1
                PushLiteral.new(eat(:token_string)[1] || raise, tag: tag)
-             when :token_push
+             when :token_push_expr
                @pos += 1
                eat(:token_l_paren)
                expr = Push.new(parse_expression(PREC_LOWEST), tag: tag)
@@ -273,24 +278,36 @@ module Pestle::Grammar
       PeekSlice.new(start, stop, tag: tag)
     end
 
-    SLASH_U_ESCAPE_DIGITS = [2, 4, 6].freeze
+    RE_SLASH_X = /\\x\{([0-9a-fA-F]{2})\}/
+    RE_SLASH_U = /\\u\{([0-9a-fA-F]{2,6})\}/
 
     def unescape(value, token)
       unescaped = [] # : Array[String]
-      index = 0
-      length = value.length
+      scanner = StringScanner.new(value)
 
-      while index < length
-        ch = value.byteslice(index) || raise
+      until scanner.eos?
+        if scanner.scan(RE_SLASH_X)
+          unescaped << (scanner.captures&.first || raise).to_i(16).chr
+          next
+        end
+
+        if scanner.scan(RE_SLASH_U)
+          unescaped << (scanner.captures&.first || raise).to_i(16).chr
+          next
+        end
+
+        ch = scanner.getch
+
+        break if ch.nil?
 
         unless ch == "\\"
           unescaped << ch
           next
         end
 
-        index += 1
+        ch = scanner.getch
 
-        case value.byteslice(index)
+        case ch
         when "\""
           unescaped << "\""
         when "'"
@@ -309,38 +326,11 @@ module Pestle::Grammar
           unescaped << "\r"
         when "t"
           unescaped << "\t"
-        when "x"
-          # TODO: Handle incomplete or malformed \x escape sequences
-          unescaped << value.byteslice((index + 1)...(index + 3)).to_i(16).chr # steep:ignore
-          index += 3
-        when "u"
-          index += 1
-
-          unless value.byteslice(index) == "{"
-            raise PestGrammarError.new("expected an opening brace", @source,
-                                       token)
-          end
-
-          index += 1
-          closing_brace_index = value.index("}", index)
-          if closing_brace_index.nil?
-            raise PestGrammarError.new("unclosed escape sequence", @source,
-                                       token)
-          end
-
-          hex_digit_length = closing_brace_index - index
-
-          unless SLASH_U_ESCAPE_DIGITS.include?(hex_digit_length)
-            raise PestGrammarError.new("expected \\u{00}, \\u{0000} or \\u{000000}", @source, token)
-          end
-
-          unescaped << value.byteslice(index...(index + hex_digit_length)).to_i(16).chr # steep:ignore
-          index += (hex_digit_length + 1)
+        when nil
+          raise PestGrammarError.new("incomplete escape sequence", @source, token)
         else
           raise PestGrammarError.new("unknown escape sequence", @source, token)
         end
-
-        index += 1
       end
 
       unescaped.join

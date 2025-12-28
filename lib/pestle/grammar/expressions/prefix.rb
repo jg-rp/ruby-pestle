@@ -15,7 +15,10 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
-      @expression.parse(state, [])
+      state.checkpoint
+      matched = @expression.parse(state, [])
+      state.restore
+      matched
     end
 
     def children = [@expression]

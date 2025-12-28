@@ -3,6 +3,7 @@
 require_relative "pestle/version"
 require_relative "pestle/grammar/lexer"
 require_relative "pestle/grammar/parser"
+require_relative "pestle/pair"
 require_relative "pestle/parser"
 
 module Pestle

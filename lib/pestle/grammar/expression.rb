@@ -16,7 +16,7 @@ module Pestle::Grammar
       raise "all expressions must implement `parse: (ParserState, Array[Pair]) -> bool`"
     end
 
-    # Return this expressions direct child expressions.
+    # Return this expression's direct child expressions.
     def children
       raise "all expressions must implement `children: () -> Array[Expression]`"
     end
