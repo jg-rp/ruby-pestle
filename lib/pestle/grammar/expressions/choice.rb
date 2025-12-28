@@ -10,6 +10,11 @@ module Pestle::Grammar
       @expressions = expressions
     end
 
+    def to_s
+      choice = @expressions.map(&:to_s).join(" | ")
+      "#{tag_s}#{choice}"
+    end
+
     def parse(state, pairs)
       @expressions.each do |expr|
         state.checkpoint

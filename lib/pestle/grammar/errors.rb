@@ -7,15 +7,13 @@ module Pestle::Grammar
 
     FULL_MESSAGE = ((RUBY_VERSION.split(".")&.map(&:to_i) <=> [3, 2, 0]) || -1) < 1
 
-    def initialize(message, token = nil)
+    def initialize(message, source, token)
       super(message)
       @token = token
-      @source = nil
+      @source = source
     end
 
     def detailed_message(highlight: true, **kwargs)
-      return super unless @source.is_a?(String) && @token
-
       _kind, value, index = @token || raise
       line, col, current_line = error_context(@source || raise, index)
       name_and_position = "#{current_line.inspect}:#{line}:#{col}"

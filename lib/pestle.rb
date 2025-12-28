@@ -8,7 +8,7 @@ require_relative "pestle/parser"
 module Pestle
   def self.parse_grammar(grammar)
     tokens = Pestle::Grammar::Lexer.tokenize(grammar)
-    parser = Pestle::Grammar::Parser.new(tokens)
+    parser = Pestle::Grammar::Parser.new(grammar, tokens)
     parser.parse
   end
 end

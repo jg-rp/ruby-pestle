@@ -9,6 +9,10 @@ module Pestle::Grammar
       @value = value
     end
 
+    def to_s
+      "#{tag_s}PUSH(\"#{value}\")"
+    end
+
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       state.stack_push(@value)
       true
@@ -21,6 +25,10 @@ module Pestle::Grammar
     def initialize(expression, tag: nil)
       super(tag: tag)
       @expression = expression
+    end
+
+    def to_s
+      "#{tag_s}PUSH( #{@expression} )"
     end
 
     def parse(state, pairs)
@@ -48,6 +56,10 @@ module Pestle::Grammar
       @stop = stop
     end
 
+    def to_s
+      "#{tag_s}PEEK[#{@start}..#{stop}]"
+    end
+
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       start_pos = state.scanner.pos
       state.stack_peek_slice(@start, @stop).each do |s|
@@ -62,6 +74,10 @@ module Pestle::Grammar
   end
 
   class Peek < Terminal
+    def to_s
+      "#{tag_s}PEEK"
+    end
+
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       peeked = state.stack_peek
       return false if peeked.nil?
@@ -71,6 +87,10 @@ module Pestle::Grammar
   end
 
   class PeekAll < Terminal
+    def to_s
+      "#{tag_s}PEEK_ALL"
+    end
+
     def parse(state, pairs)
       start_pos = state.scanner.pos
       children = [] # : Array[Pestle::Pair]
@@ -90,6 +110,10 @@ module Pestle::Grammar
   end
 
   class Pop < Terminal
+    def to_s
+      "#{tag_s}POP"
+    end
+
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       peeked = state.stack_peek
       return false if peeked.nil?
@@ -104,6 +128,10 @@ module Pestle::Grammar
   end
 
   class PopAll < Terminal
+    def to_s
+      "#{tag_s}POP_ALL"
+    end
+
     def parse(state, pairs)
       start_pos = state.scanner.pos
       children = [] # : Array[Pestle::Pair]
@@ -124,6 +152,10 @@ module Pestle::Grammar
   end
 
   class Drop < Terminal
+    def to_s
+      "#{tag_s}DROP"
+    end
+
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       !state.stack_pop.nil?
     end

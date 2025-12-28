@@ -10,6 +10,10 @@ module Pestle::Grammar
       @expression = expression
     end
 
+    def to_s
+      "#{tag_s}&#{@expression}"
+    end
+
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       @expression.parse(state, [])
     end
@@ -24,6 +28,10 @@ module Pestle::Grammar
     def initialize(expression, tag: nil)
       super(tag: tag)
       @expression = expression
+    end
+
+    def to_s
+      "#{tag_s}!#{@expression}"
     end
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument

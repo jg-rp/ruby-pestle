@@ -10,6 +10,10 @@ module Pestle::Grammar
       @expression = expression
     end
 
+    def to_s
+      "#{@expression}?"
+    end
+
     def parse(state, pairs)
       children = [] # : Array[Pestle::Pair]
       state.checkpoint
@@ -33,6 +37,10 @@ module Pestle::Grammar
     def initialize(expression)
       super(tag: nil)
       @expression = expression
+    end
+
+    def to_s
+      "#{@expression}*"
     end
 
     def parse(state, pairs)
@@ -62,6 +70,10 @@ module Pestle::Grammar
     def initialize(expression)
       super(tag: nil)
       @expression = expression
+    end
+
+    def to_s
+      "#{@expression}+"
     end
 
     def parse(state, pairs)
@@ -107,6 +119,10 @@ module Pestle::Grammar
       @number = number
     end
 
+    def to_s
+      "#{@expression}{#{@number}}"
+    end
+
     def parse(state, pairs)
       return true if @number.zero?
 
@@ -147,6 +163,10 @@ module Pestle::Grammar
       @number = number
     end
 
+    def to_s
+      "#{@expression}{#{@number},}"
+    end
+
     def parse(state, pairs)
       return true if @number.zero?
 
@@ -185,6 +205,10 @@ module Pestle::Grammar
       @number = number
     end
 
+    def to_s
+      "#{@expression}{,#{@number}}"
+    end
+
     def parse(state, pairs)
       return true if @number.zero?
 
@@ -219,6 +243,10 @@ module Pestle::Grammar
       @expression = expression
       @min = min
       @max = max
+    end
+
+    def to_s
+      "#{@expression}{#{@min},#{@max}}"
     end
 
     def parse(state, pairs)

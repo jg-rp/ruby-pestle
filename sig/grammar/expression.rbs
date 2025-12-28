@@ -10,6 +10,10 @@ module Pestle::Grammar
     def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
 
     def children: () -> Array[Expression]
+                
+    def tag_s: () -> String?
+
+    def tree_view: () -> String
   end
 
   # Base class for terminal expressions (those without children).

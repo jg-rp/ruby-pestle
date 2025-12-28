@@ -12,6 +12,10 @@ module Pestle::Grammar
       @re = /[#{Regexp.escape(start)}-#{Regexp.escape(stop)}]/o
     end
 
+    def to_s
+      "#{tag_s}['#{@start}'..'#{@stop}']"
+    end
+
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       !state.scanner.scan(@re).nil?
     end

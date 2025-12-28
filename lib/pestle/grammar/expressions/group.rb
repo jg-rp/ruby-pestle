@@ -10,6 +10,10 @@ module Pestle::Grammar
       @expression = expression
     end
 
+    def to_s
+      "#{tag_s}(#{@expression})"
+    end
+
     def parse(state, pairs)
       @expression.parse(state, pairs)
     end

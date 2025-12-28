@@ -9,6 +9,10 @@ module Pestle::Grammar
       @value = value
     end
 
+    def to_s
+      @value
+    end
+
     def parse(state, pairs)
       unless @tag.nil?
         state.with_tag(@tag || raise) do

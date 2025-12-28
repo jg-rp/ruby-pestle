@@ -11,6 +11,10 @@ module Pestle::Grammar
       @re = /#{Regexp.escape(value)}/o
     end
 
+    def to_s
+      @value.inspect
+    end
+
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       !state.scanner.scan(@re).nil?
     end
@@ -24,6 +28,10 @@ module Pestle::Grammar
       super(tag: tag)
       @value = value
       @re = /#{Regexp.escape(value)}/io
+    end
+
+    def to_s
+      "^#{@value.inspect}"
     end
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument

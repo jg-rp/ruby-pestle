@@ -30,5 +30,13 @@ module Pestle
       # TODO: error reporting with furthest rule
       raise "parsing error"
     end
+
+    def tree_view
+      trees = @rules.values.filter do |rule|
+        !rule.is_a?(Pestle::Grammar::BuiltInRule)
+      end.map(&:tree_view)
+
+      trees.join("\n\n")
+    end
   end
 end

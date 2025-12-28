@@ -1,6 +1,8 @@
 module Pestle::Grammar
   # Pest grammar parser.
   class Parser
+    @source: String
+
     @tokens: Array[[Symbol, String?, Integer]]
 
     @pos: Integer
@@ -14,7 +16,13 @@ module Pestle::Grammar
 
     PRECEDENCES: Hash[Symbol, Integer]
 
-    def initialize: (Array[[Symbol, String?, Integer]] tokens) -> void
+    INFIX_OPERATORS: Set[Symbol]
+
+    def initialize: (String source, Array[[Symbol, String?, Integer]] tokens) -> void
+                  
+    SLASH_U_ESCAPE_DIGITS: Array[Integer]
+
+    def unescape: (String value, [Symbol, String?, Integer] token) -> String
 
     # Return the current token without advancing the pointer.
     # An EOF token is returned if there are no tokens left.
@@ -43,5 +51,7 @@ module Pestle::Grammar
     def parse_repeat_expression: (Expression expr) -> Expression
 
     def parse_peek_expression: (String? tag) -> Expression
+    
+    
   end
 end

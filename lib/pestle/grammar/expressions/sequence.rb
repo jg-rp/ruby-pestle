@@ -10,6 +10,11 @@ module Pestle::Grammar
       @expressions = expressions
     end
 
+    def to_s
+      seq = @expressions.map(&:to_s).join(" ~ ")
+      "#{tag_s}#{seq}"
+    end
+
     def parse(state, pairs)
       children = [] # : Array[Pestle::Pair]
 

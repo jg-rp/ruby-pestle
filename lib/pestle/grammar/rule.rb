@@ -22,6 +22,23 @@ module Pestle::Grammar
       @doc = doc
     end
 
+    def to_s
+      modifier = case @modifier
+                 when SILENT
+                   "_"
+                 when ATOMIC
+                   "@"
+                 when COMPOUND
+                   "$"
+                 when NONATOMIC
+                   "!"
+                 else
+                   ""
+                 end
+
+      "#{@name} = #{modifier}{ #{@expression} }"
+    end
+
     def parse(state, pairs)
       start_pos = state.scanner.pos
       children = [] # : Array[Pestle::Pair]

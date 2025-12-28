@@ -1,17 +1,17 @@
 module Pestle::Grammar
   # Pest grammar parsing error.
   class PestGrammarError < StandardError
-    @token: [Symbol, String?, Integer] | nil
+    @token: [Symbol, String?, Integer]
 
-    @source: String?
+    @source: String
 
-    attr_accessor token: ([Symbol, String?, Integer] | nil)
+    attr_accessor token: [Symbol, String?, Integer]
 
-    attr_accessor source: String?
+    attr_accessor source: String
 
     FULL_MESSAGE: bool
 
-    def initialize: (String message, ?[Symbol, String?, Integer]? token) -> void
+    def initialize: (String message, String source, [Symbol, String?, Integer] token) -> void
 
     def detailed_message: (?highlight: bool, **untyped kwargs) -> String
 

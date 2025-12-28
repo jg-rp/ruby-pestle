@@ -12,7 +12,6 @@ require_relative "expressions/sequence"
 require_relative "expressions/stack"
 require_relative "expressions/string"
 require_relative "rule"
-require_relative "unescape"
 
 module Pestle::Grammar
   # Pest grammar parser.
@@ -27,7 +26,10 @@ module Pestle::Grammar
       token_sequence_op: PREC_SEQUENCE
     }.freeze
 
-    def initialize(tokens)
+    INFIX_OPERATORS = Set.new(%i[token_choice_op token_sequence_op])
+
+    def initialize(source, tokens)
+      @source = source
       @tokens = tokens
       @pos = 0
       @eof = tokens.last || raise
@@ -52,7 +54,7 @@ module Pestle::Grammar
       token = self.next
 
       unless token.first == kind
-        raise PestGrammarError.new(message || "unexpected #{token.first}", token)
+        raise PestGrammarError.new(message || "unexpected #{token.first}", @source, token)
       end
 
       token
@@ -118,9 +120,10 @@ module Pestle::Grammar
              when :token_ci_string
                InsensitiveString.new(self.next[1] || raise, tag: tag)
              when :token_string_esc
-               StringLiteral.new(Pestle::Grammar.unescape(self.next[1] || raise, token), tag: tag)
+               StringLiteral.new(unescape(self.next[1] || raise, token),
+                                 tag: tag)
              when :token_ci_string_esc
-               InsensitiveString.new(Pestle::Grammar.unescape(self.next[1] || raise, token),
+               InsensitiveString.new(unescape(self.next[1] || raise, token),
                                      tag: tag)
              when :token_l_paren
                @pos += 1
@@ -154,9 +157,9 @@ module Pestle::Grammar
                @pos += 1
                PopAll.new(tag: tag)
              when :token_char
-               start = Pestle::Grammar.unescape(self.next[1] || raise, token)
+               start = unescape(self.next[1] || raise, token)
                eat(:token_range_op)
-               stop = Pestle::Grammar.unescape(eat(:token_char)[1] || raise, token)
+               stop = unescape(eat(:token_char)[1] || raise, token)
                Range.new(start, stop, tag: tag)
              when :token_pos_pred
                @pos += 1
@@ -165,15 +168,15 @@ module Pestle::Grammar
                @pos += 1
                NegativePredicate.new(parse_expression(PREC_PREFIX), tag: tag)
              else
-               raise PestGrammarError.new("unexpected token #{token.first}", token)
+               raise PestGrammarError.new("unexpected token #{token.first}", @source, token)
              end
 
       left = parse_postfix_expression(left)
 
       loop do
         kind = current.first
-        prec = PRECEDENCES[kind]
-        break if kind == :token_eof || prec.nil? || prec < precedence
+        break unless INFIX_OPERATORS.member?(kind)
+        break if (PRECEDENCES[kind] || PREC_LOWEST) < precedence
 
         left = parse_infix_expression(left)
       end
@@ -195,18 +198,18 @@ module Pestle::Grammar
           Choice.new(left, right)
         end
       when :token_sequence_op
-        if right.is_a?(Choice)
+        if right.is_a?(Sequence)
           Sequence.new(left, *right.children)
         else
           Sequence.new(left, right)
         end
       else
-        raise PestGrammarError.new("unexpected operator #{kind}", token)
+        raise PestGrammarError.new("unexpected operator #{kind}", @source, token)
       end
     end
 
     def parse_postfix_expression(expr)
-      token = self.next
+      token = current
       kind = token.first
 
       case kind
@@ -256,7 +259,7 @@ module Pestle::Grammar
         return RepeatMax.new(expr, number)
       end
 
-      raise PestGrammarError.new("expected a number or a comma", token)
+      raise PestGrammarError.new("expected a number or a comma", @source, token)
     end
 
     def parse_peek_expression(tag)
@@ -268,6 +271,79 @@ module Pestle::Grammar
       stop = ((self.next[1] || raise).to_i if current.first == :token_integer)
       eat(:token_r_bracket)
       PeekSlice.new(start, stop, tag: tag)
+    end
+
+    SLASH_U_ESCAPE_DIGITS = [2, 4, 6].freeze
+
+    def unescape(value, token)
+      unescaped = [] # : Array[String]
+      index = 0
+      length = value.length
+
+      while index < length
+        ch = value.byteslice(index) || raise
+
+        unless ch == "\\"
+          unescaped << ch
+          next
+        end
+
+        index += 1
+
+        case value.byteslice(index)
+        when "\""
+          unescaped << "\""
+        when "'"
+          unescaped << "'"
+        when "\\"
+          unescaped << "\\"
+        when "/"
+          unescaped << "/"
+        when "b"
+          unescaped << "\x08"
+        when "f"
+          unescaped << "\x0c"
+        when "n"
+          unescaped << "\n"
+        when "r"
+          unescaped << "\r"
+        when "t"
+          unescaped << "\t"
+        when "x"
+          # TODO: Handle incomplete or malformed \x escape sequences
+          unescaped << value.byteslice((index + 1)...(index + 3)).to_i(16).chr # steep:ignore
+          index += 3
+        when "u"
+          index += 1
+
+          unless value.byteslice(index) == "{"
+            raise PestGrammarError.new("expected an opening brace", @source,
+                                       token)
+          end
+
+          index += 1
+          closing_brace_index = value.index("}", index)
+          if closing_brace_index.nil?
+            raise PestGrammarError.new("unclosed escape sequence", @source,
+                                       token)
+          end
+
+          hex_digit_length = closing_brace_index - index
+
+          unless SLASH_U_ESCAPE_DIGITS.include?(hex_digit_length)
+            raise PestGrammarError.new("expected \\u{00}, \\u{0000} or \\u{000000}", @source, token)
+          end
+
+          unescaped << value.byteslice(index...(index + hex_digit_length)).to_i(16).chr # steep:ignore
+          index += (hex_digit_length + 1)
+        else
+          raise PestGrammarError.new("unknown escape sequence", @source, token)
+        end
+
+        index += 1
+      end
+
+      unescaped.join
     end
   end
 end
