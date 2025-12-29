@@ -1089,5 +1089,95 @@ class TestGrammar < Minitest::Spec
     assert_equal(want, PARSER.parse("newline", "\n\r\n\r").dump)
   end
 
-  # TODO: test_unicode
+  def test_unicode
+    want = [
+      {
+        "rule" => "unicode",
+        "span" => {
+          "str" => "\u0646\u0627\u0645\u0647\u0627\u06cc",
+          "start" => 0,
+          "end" => 12
+        },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("unicode", "نامهای").dump)
+  end
+
+  def test_shadow_builtin
+    want = [
+      {
+        "rule" => "SYMBOL",
+        "span" => { "str" => "shadows builtin", "start" => 0, "end" => 15 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("SYMBOL", "shadows builtin").dump)
+  end
+
+  def test_han
+    want = [
+      {
+        "rule" => "han",
+        "span" => { "str" => "\u4f60\u597d", "start" => 0, "end" => 6 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("han", "你好").dump)
+  end
+
+  def test_hangul
+    want = [
+      {
+        "rule" => "hangul",
+        "span" => { "str" => "\uc5ec\ubcf4\uc138\uc694", "start" => 0, "end" => 12 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("hangul", "여보세요").dump)
+  end
+
+  def test_hiragana
+    want = [
+      {
+        "rule" => "hiragana",
+        "span" => { "str" => "\u3053\u3093\u306b\u3061\u306f", "start" => 0, "end" => 15 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("hiragana", "こんにちは").dump)
+  end
+
+  def test_arabic
+    want = [
+      {
+        "rule" => "arabic",
+        "span" => {
+          "str" => "\u0646\u0627\u0645\u0647\u0627\u06cc",
+          "start" => 0,
+          "end" => 12
+        },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("arabic", "نامهای").dump)
+  end
+
+  def test_emoji
+    want = [
+      {
+        "rule" => "emoji",
+        "span" => { "str" => "👶", "start" => 0, "end" => 4 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("emoji", "👶").dump)
+  end
 end

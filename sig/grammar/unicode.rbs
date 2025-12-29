@@ -1,0 +1,15 @@
+module Pestle::Grammar
+  # A builtin rule matching Unicode property.
+  class UnicodeRule < BuiltInRule
+    def initialize: (String name, Regexp re) -> void
+  end
+
+  GENERAL_CATEGORY_MAP: Hash[String, String]
+
+  BINARY_PROPERTY_MAP: Hash[String, String]
+
+  SCRIPT_NAMES: Array[String]
+
+  UNICODE_RULES: Hash[String, UnicodeRule]
+
+end

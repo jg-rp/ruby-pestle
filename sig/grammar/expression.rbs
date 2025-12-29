@@ -20,4 +20,20 @@ module Pestle::Grammar
   class Terminal < Expression
     def children: () -> ::Array[Expression]
   end
+
+  class RegexExpression < Terminal
+    @pattern: String
+
+    @re: Regexp
+
+    attr_reader pattern: String
+
+    attr_reader re: Regexp
+
+    def initialize: (String pattern, Regexp re) -> void
+
+    def to_s: () -> ::String
+
+    def parse: (Pestle::ParserState state, Array[Pestle::Pair] pairs) -> bool
+  end
 end

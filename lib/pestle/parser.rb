@@ -2,6 +2,7 @@
 
 require_relative "grammar/builtin_rules/ascii"
 require_relative "grammar/builtin_rules/special"
+require_relative "grammar/builtin_rules/unicode"
 require_relative "errors"
 require_relative "state"
 
@@ -15,8 +16,13 @@ module Pestle
     end
 
     def initialize(rules, doc)
-      # TODO: Unicode rules
-      @rules = { **Pestle::Grammar::SPECIAL_RULES, **Pestle::Grammar::ASCII_RULES, **rules }
+      @rules = {
+        **Pestle::Grammar::SPECIAL_RULES,
+        **Pestle::Grammar::ASCII_RULES,
+        **Pestle::Grammar::UNICODE_RULES,
+        **rules
+      }
+
       @doc = doc
       # TODO: optimize
     end

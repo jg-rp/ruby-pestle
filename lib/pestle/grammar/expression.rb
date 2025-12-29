@@ -68,4 +68,23 @@ module Pestle::Grammar
   class Terminal < Expression
     def children = []
   end
+
+  # A terminal expression that matches using a regular expression.
+  class RegexExpression < Terminal
+    attr_reader :pattern, :re
+
+    def initialize(pattern, re)
+      super()
+      @pattern = pattern
+      @re = re
+    end
+
+    def to_s
+      "/#{@pattern}/"
+    end
+
+    def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
+      !state.scanner.scan(@re).nil?
+    end
+  end
 end
