@@ -243,8 +243,6 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      return true if @number.zero?
-
       children = [] # : Array[Pestle::Pair]
       count = 0
 

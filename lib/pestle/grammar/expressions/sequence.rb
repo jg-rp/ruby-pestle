@@ -17,14 +17,19 @@ module Pestle::Grammar
 
     def parse(state, pairs)
       children = [] # : Array[Pestle::Pair]
+      state.checkpoint
 
       @expressions.each_with_index do |expr, i|
-        return false unless expr.parse(state, children)
+        unless expr.parse(state, children)
+          state.restore
+          return false
+        end
 
         state.parse_trivia(children) if i < @expressions.length - 1
       end
 
       pairs.concat(children)
+      state.ok
       true
     end
 

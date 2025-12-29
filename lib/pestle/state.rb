@@ -63,7 +63,7 @@ module Pestle
       item_count, remained_count = @user_stack_lengths.pop || raise
 
       if remained_count < @user_stack.length
-        @user_stack_popped.slice!(remained_count..) # steep:ignore
+        @user_stack.slice!(remained_count..) # steep:ignore
       end
 
       return unless item_count > remained_count

@@ -45,3 +45,6 @@ Metrics/BlockLength:
 
 Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true
+
+Minitest/AssertPredicate:
+  Enabled: false
