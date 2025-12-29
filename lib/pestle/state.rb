@@ -84,12 +84,13 @@ module Pestle
     end
 
     def stack_pop
+      size = @user_stack.length
       popped = @user_stack.pop
       return nil if popped.nil?
 
       unless @user_stack_lengths.empty?
         remained_count = @user_stack_lengths.last[1]
-        if @user_stack.length == remained_count
+        if size == remained_count
           @user_stack_lengths.last[1] -= 1
           @user_stack_popped << popped
         end

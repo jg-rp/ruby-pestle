@@ -36,7 +36,7 @@ module Pestle::Grammar
   # A builtin rule matching the end of the input string.
   class EOI < BuiltInRule
     def initialize
-      super("EOI", EndOfInput.new, modifier: Rule::SILENT)
+      super("EOI", EndOfInput.new)
     end
   end
 

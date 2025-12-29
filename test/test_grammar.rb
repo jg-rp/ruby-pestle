@@ -938,4 +938,156 @@ class TestGrammar < Minitest::Spec
 
     assert_equal(want, PARSER.parse("repeat_mutate_stack", "a,b,c,cba").dump)
   end
+
+  def test_checkpoint_restore
+    want = [
+      {
+        "rule" => "checkpoint_restore",
+        "span" => { "str" => "a", "start" => 0, "end" => 1 },
+        "inner" => [
+          {
+            "rule" => "EOI",
+            "span" => { "str" => "", "start" => 1, "end" => 1 },
+            "inner" => []
+          }
+        ]
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("checkpoint_restore", "a").dump)
+  end
+
+  def test_ascii_digits
+    want = [
+      {
+        "rule" => "ascii_digits",
+        "span" => { "str" => "6", "start" => 0, "end" => 1 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("ascii_digits", "6").dump)
+  end
+
+  def test_ascii_nonzero_digits
+    want = [
+      {
+        "rule" => "ascii_nonzero_digits",
+        "span" => { "str" => "5", "start" => 0, "end" => 1 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("ascii_nonzero_digits", "5").dump)
+  end
+
+  def test_ascii_bin_digits
+    want = [
+      {
+        "rule" => "ascii_bin_digits",
+        "span" => { "str" => "1", "start" => 0, "end" => 1 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("ascii_bin_digits", "1").dump)
+  end
+
+  def test_ascii_oct_digits
+    want = [
+      {
+        "rule" => "ascii_oct_digits",
+        "span" => { "str" => "3", "start" => 0, "end" => 1 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("ascii_oct_digits", "3").dump)
+  end
+
+  def test_ascii_hex_digits
+    want = [
+      {
+        "rule" => "ascii_hex_digits",
+        "span" => { "str" => "6bC", "start" => 0, "end" => 3 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("ascii_hex_digits", "6bC").dump)
+  end
+
+  def test_ascii_alpha_lowers
+    want = [
+      {
+        "rule" => "ascii_alpha_lowers",
+        "span" => { "str" => "a", "start" => 0, "end" => 1 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("ascii_alpha_lowers", "a").dump)
+  end
+
+  def test_ascii_alpha_uppers
+    want = [
+      {
+        "rule" => "ascii_alpha_uppers",
+        "span" => { "str" => "K", "start" => 0, "end" => 1 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("ascii_alpha_uppers", "K").dump)
+  end
+
+  def test_ascii_alphas
+    want = [
+      {
+        "rule" => "ascii_alphas",
+        "span" => { "str" => "wF", "start" => 0, "end" => 2 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("ascii_alphas", "wF").dump)
+  end
+
+  def test_ascii_alphanumerics
+    want = [
+      {
+        "rule" => "ascii_alphanumerics",
+        "span" => { "str" => "4jU", "start" => 0, "end" => 3 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("ascii_alphanumerics", "4jU").dump)
+  end
+
+  def test_asciis
+    want = [
+      {
+        "rule" => "asciis",
+        "span" => { "str" => "x02", "start" => 0, "end" => 3 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("asciis", "x02").dump)
+  end
+
+  def test_newline
+    want = [
+      {
+        "rule" => "newline",
+        "span" => { "str" => "\n\r\n\r", "start" => 0, "end" => 4 },
+        "inner" => []
+      }
+    ]
+
+    assert_equal(want, PARSER.parse("newline", "\n\r\n\r").dump)
+  end
+
+  # TODO: test_unicode
 end
