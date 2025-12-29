@@ -1,4 +1,4 @@
-# frozen_string_literal => true
+# frozen_string_literal: true
 
 # These tests are translated from Rust pest's `grammars.rs`.
 #
