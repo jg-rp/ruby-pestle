@@ -8,7 +8,7 @@
 
 require "test_helper"
 
-class TestTokenize < Minitest::Spec
+class TestTokenize < Minitest::Test
   make_my_diffs_pretty!
 
   def assert_tokens(tokens, expect)

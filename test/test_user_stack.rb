@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class TestUserStack < Minitest::Spec
+class TestUserStack < Minitest::Test
   make_my_diffs_pretty!
 
   def test_snapshot_empty_stack

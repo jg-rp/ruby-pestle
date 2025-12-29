@@ -9,7 +9,7 @@
 require "pathname"
 require "test_helper"
 
-class TestGrammar < Minitest::Spec
+class TestGrammar < Minitest::Test
   make_my_diffs_pretty!
 
   GRAMMAR = Pathname.new("test/grammars/grammar.pest")

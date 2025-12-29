@@ -85,6 +85,8 @@ module Pestle
 
     attr_reader name: String
 
+    attr_reader children: Array[Pair]
+
     def initialize: (String source, Integer start, Integer stop, Grammar::Rule rule, Array[Pair] children, ?tag: untyped?) -> void
 
     def deconstruct: () -> Array[untyped]

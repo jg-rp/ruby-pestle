@@ -74,16 +74,21 @@ module Pestle
       target_line_index = -1
 
       lines.each_with_index do |line, i|
-        cumulative_length += line.length
-        next unless @pos < cumulative_length
-
-        target_line_index = i
-        line_number = target_line_index + 1
-        column_number = @pos - (cumulative_length - lines[target_line_index].length)
-        return [line_number, column_number]
+        cumulative_length += line.bytesize
+        if @pos < cumulative_length
+          target_line_index = i
+          break
+        end
       end
 
-      raise "position is out of bounds for text"
+      return lines.length + 1, 1 if target_line_index == -1
+
+      line_number = target_line_index + 1
+
+      # Column numbers are in Unicode code points, not bytes or grapheme clusters.
+      byte_column_index = @pos - (cumulative_length - lines[target_line_index].bytesize)
+      column_number = (lines[target_line_index].byteslice(0, byte_column_index) || raise).length + 1
+      [line_number, column_number]
     end
 
     def line_of
@@ -98,7 +103,7 @@ module Pestle
   class Pair
     include Enumerable
 
-    attr_reader :start, :end, :rule, :tag, :name
+    attr_reader :start, :end, :rule, :tag, :name, :children
 
     def initialize(source, start, stop, rule, children, tag: nil)
       @source = source
@@ -241,7 +246,7 @@ module Pestle
       if compact
         @pairs.map(&:dumps).join("\n")
       else
-        JSON.generate(dump, { indent: "  " })
+        JSON.pretty_generate(dump)
       end
     end
 
