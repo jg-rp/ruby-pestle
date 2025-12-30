@@ -15,8 +15,11 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs)
-      # TODO: with tag
-      @expression.parse(state, pairs)
+      return @expression.parse(state, pairs) unless @tag
+
+      state.with_tag(@tag || raise) do
+        return @expression.parse(state, pairs)
+      end
     end
 
     def children = [@expression]

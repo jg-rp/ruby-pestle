@@ -121,6 +121,7 @@ class TestSQLGrammar < Minitest::Test
                               "create user \"my_user\" with password 'strong_password123'").dump)
   end
 
+  # rubocop: disable Layout/LineLength
   def test_insert_from_select
     want = [
       {
@@ -473,6 +474,7 @@ class TestSQLGrammar < Minitest::Test
         ]
       }
     ]
+    # rubocop: enable Layout/LineLength
 
     lines = [
       'insert into "my_table" ("col_1", "col_2")',

@@ -57,14 +57,14 @@ module Pestle::Grammar
         matched = @expression.parse(state, children)
       end
 
+      tag = state.tags.pop
+
       return false unless matched
 
       if @modifier.anybits?(SILENT)
         pairs.concat(children)
         return true
       end
-
-      tag = state.tags.pop
 
       if @modifier.anybits?(ATOMIC)
         # @type var rule: Rule?
