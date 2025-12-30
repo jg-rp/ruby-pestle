@@ -28,15 +28,13 @@ module Pestle
     end
 
     def parse(start_rule, text, start_pos: 0)
-      rule = @rules[start_rule] || raise
+      rule = @rules[start_rule.to_s] || raise
       state = ParserState.new(text, @rules, start_pos: start_pos)
       pairs = [] # : Array[Pair]
 
-      # TODO: catch and inject text into errors
       return Pairs.new(pairs) if rule.parse(state, pairs)
 
-      # TODO: error reporting with furthest rule
-      raise(PestParsingError, "parsing error")
+      raise PestParsingError.new(PestParsingError.expected(state), state)
     end
 
     def tree_view

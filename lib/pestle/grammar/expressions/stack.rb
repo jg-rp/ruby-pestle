@@ -63,10 +63,11 @@ module Pestle::Grammar
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       start_pos = state.scanner.pos
       state.stack_peek_slice(@start, @stop).each do |s|
-        if state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
-          state.scanner.pos = start_pos
-          return false
-        end
+        next unless state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
+
+        state.record_failure(s)
+        state.scanner.pos = start_pos
+        return false
       end
 
       true
@@ -80,9 +81,18 @@ module Pestle::Grammar
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       peeked = state.stack_peek
-      return false if peeked.nil?
 
-      !state.scanner.scan(peeked).nil? # steep:ignore ArgumentTypeMismatch
+      if peeked.nil?
+        state.record_failure("PEEK")
+        return false
+      end
+
+      if state.scanner.scan(peeked).nil? # steep:ignore ArgumentTypeMismatch
+        state.record_failure(peeked)
+        false
+      else
+        true
+      end
     end
   end
 
@@ -97,6 +107,7 @@ module Pestle::Grammar
 
       state.user_stack.reverse_each.with_index do |s, i|
         if state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
+          state.record_failure(s)
           state.scanner.pos = start_pos
           return false
         end
@@ -116,9 +127,11 @@ module Pestle::Grammar
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       peeked = state.stack_peek
+      state.record_failure("POP")
       return false if peeked.nil?
 
       if state.scanner.scan(peeked).nil? # steep:ignore ArgumentTypeMismatch
+        state.record_failure(peeked)
         false
       else
         state.stack_pop
@@ -138,6 +151,7 @@ module Pestle::Grammar
 
       state.user_stack.reverse_each.with_index do |s, i|
         if state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
+          state.record_failure(s)
           state.scanner.pos = start_pos
           return false
         end
@@ -157,7 +171,12 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
-      !state.stack_pop.nil?
+      if state.stack_pop.nil?
+        state.record_failure("DROP")
+        false
+      else
+        true
+      end
     end
   end
 end

@@ -9,7 +9,7 @@ module Pestle
 
     def initialize: (Hash[String, Pestle::Grammar::Rule] rules, String? doc) -> void
 
-    def parse: (String start_rule, String text, ?start_pos: ::Integer) -> Pairs
+    def parse: (String | Symbol start_rule, String text, ?start_pos: ::Integer) -> Pairs
              
     def tree_view: () -> String
   end

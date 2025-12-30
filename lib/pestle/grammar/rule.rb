@@ -44,6 +44,8 @@ module Pestle::Grammar
       children = [] # : Array[Pestle::Pair]
       matched = false
 
+      state.rule_stack << @name
+
       # TODO: ensure COMMENT and WHITESPACE are atomic during parsing
       if @modifier.anybits?(ATOMIC | COMPOUND)
         state.atomic do
@@ -57,6 +59,7 @@ module Pestle::Grammar
         matched = @expression.parse(state, children)
       end
 
+      state.rule_stack.pop
       tag = state.tags.pop
 
       return false unless matched
@@ -82,7 +85,7 @@ module Pestle::Grammar
         end
       end
 
-      pairs << Pestle::Pair.new(state.text, start_pos, state.scanner.pos, self, children, tag: tag)
+      pairs << Pestle::Pair.new(state.text, start_pos, state.scanner.pos, @name, children, tag: tag)
 
       true
     end

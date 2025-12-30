@@ -1,14 +1,14 @@
 module Pestle
   class Token
-    @rule: Grammar::Rule
+    @rule: Symbol
 
     @pos: Integer
 
-    attr_reader rule: Grammar::Rule
+    attr_reader rule: Symbol
 
     attr_reader pos: Integer
 
-    def initialize: (Grammar::Rule rule, Integer pos) -> void
+    def initialize: (Symbol rule, Integer pos) -> void
   end
 
   class Start < Token
@@ -67,7 +67,7 @@ module Pestle
 
     @end: Integer
 
-    @rule: Grammar::Rule
+    @rule: Symbol
 
     @children: Array[Pair]
 
@@ -79,7 +79,7 @@ module Pestle
 
     attr_reader end: Integer
 
-    attr_reader rule: Grammar::Rule
+    attr_reader rule: Symbol
 
     attr_reader tag: String?
 
@@ -87,7 +87,7 @@ module Pestle
 
     attr_reader children: Array[Pair]
 
-    def initialize: (String source, Integer start, Integer stop, Grammar::Rule rule, Array[Pair] children, ?tag: untyped?) -> void
+    def initialize: (String source, Integer start, Integer stop, String rule_name, Array[Pair] children, ?tag: untyped?) -> void
 
     def deconstruct: () -> Array[untyped]
                    
@@ -96,6 +96,8 @@ module Pestle
     def to_s: () -> String
 
     def each: () ?{ (?) -> untyped } -> untyped
+            
+    def to_ary: () -> Array[Pair]
 
     def inner: () -> Pairs
 

@@ -3,9 +3,11 @@
 module Pestle
   # Pest parser state.
   class ParserState
-    attr_reader :text, :scanner, :rules, :user_stack, :tags, :atomic_depth
+    attr_reader :text, :scanner, :rules, :user_stack, :tags, :atomic_depth, :rule_stack,
+                :furthest_pos, :furthest_expected, :furthest_unexpected, :furthest_rules
+    attr_accessor :neg_pred_depth
 
-    # @param text [String] Source text to be parse into token pairs.
+    # @param text [String] Source text to be parsed into nested token pairs.
     # @param start_pos [Integer] A byte offset from which to start scanning `text`.
     def initialize(text, rules, start_pos: 0)
       @text = text
@@ -18,11 +20,21 @@ module Pestle
       @atomic_depth = 0
       @atomic_depth_checkpoints = [] # : Array[Integer]
 
+      # A stack of grammar-defined expression tags.
       @tags = [] # : Array[String]
 
       @user_stack = [] # : Array[String]
       @user_stack_popped = [] # : Array[String]
       @user_stack_lengths = [] # : Array[[Integer, Integer]]
+
+      # Furthest failure tracking for error reporting.
+      @suppress_failures = false
+      @rule_stack = [] # : Array[String]
+      @neg_pred_depth = 0
+      @furthest_pos = -1
+      @furthest_rules = [] # : Array[String]
+      @furthest_expected = {} # : Hash[String, Array[String]]
+      @furthest_unexpected = {} # : Hash[String, Array[String]]
     end
 
     def checkpoint
@@ -178,6 +190,33 @@ module Pestle
       @atomic_depth = 0
       yield
       @atomic_depth = @atomic_depth_checkpoints.pop || raise
+    end
+
+    # Record a terminal expression failure for error reporting.
+    def record_failure(label, rule_name = nil, force: false)
+      return if @suppress_failures || (@neg_pred_depth.positive? && !force)
+
+      rule_name ||= @rule_stack.last
+
+      if @scanner.pos > @furthest_pos
+        @furthest_pos = @scanner.pos
+        @furthest_rules = @rule_stack.dup
+        if @neg_pred_depth.odd?
+          @furthest_unexpected = { rule_name => [label] }
+          @furthest_expected = {} # : Hash[String, Array[String]]
+        else
+          @furthest_unexpected = {} # : Hash[String, Array[String]]
+          @furthest_expected = { rule_name => [label] }
+        end
+      elsif @scanner.pos == @furthest_pos
+        target = @neg_pred_depth.odd? ? @furthest_unexpected : @furthest_expected
+
+        if target.member?(rule_name)
+          target[rule_name] << label
+        else
+          target[rule_name] = [label]
+        end
+      end
     end
   end
 end

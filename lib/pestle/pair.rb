@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "JSON"
+
 module Pestle
   # User-facing token stream item. The start or end of a rule.
   class Token
@@ -105,22 +107,22 @@ module Pestle
 
     attr_reader :start, :end, :rule, :tag, :name, :children
 
-    def initialize(source, start, stop, rule, children, tag: nil)
+    def initialize(source, start, stop, rule_name, children, tag: nil)
       @source = source
       @start = start
       @end = stop
-      @rule = rule
       @children = children
       @tag = tag
-      @name = rule.name
+      @rule = rule_name.to_sym
+      @name = rule_name
     end
 
     def deconstruct
-      [@name, @children, @start, @end]
+      [@rule, @children]
     end
 
     def deconstruct_keys(keys) # rubocop: disable Lint/UnusedMethodArgument
-      { name: @name, children: @children, start: @start, end: @end }
+      { name: @name, rule: @rule, children: @children, start: @start, end: @end }
     end
 
     def to_s
@@ -131,6 +133,10 @@ module Pestle
       return enum_for(:each) unless block
 
       @children.each(&block)
+    end
+
+    def to_ary
+      @children
     end
 
     def inner
@@ -158,6 +164,7 @@ module Pestle
     end
 
     def dump
+      # @type var obj: Hash[String, untyped]
       obj = {
         "rule" => @name,
         "span" => {

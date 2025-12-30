@@ -1,5 +1,22 @@
 module Pestle
   # Pest parsing error.
   class PestParsingError < StandardError
+    @state: ParserState
+
+    attr_reader state: ParserState
+
+    FULL_MESSAGE: bool
+
+    def self.expected: (ParserState state) -> String
+
+    def initialize: (String message, ParserState state) -> void
+
+    def detailed_message: (?highlight: bool, **untyped kwargs) -> String
+
+    def full_message: (?highlight: bool, ?order: ::Symbol) -> ::String
+
+    def expected_labels: () ->String
+
+    def error_context: (String text, Integer byte_index) -> [Integer, Integer, String]
   end
 end
