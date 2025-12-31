@@ -5,6 +5,7 @@ require_relative "pestle/grammar/lexer"
 require_relative "pestle/grammar/parser"
 require_relative "pestle/pair"
 require_relative "pestle/parser"
+require_relative "pestle/pratt"
 
 module Pestle
   def self.parse_grammar(grammar)

@@ -1,0 +1,27 @@
+module Pestle
+  # A Generic Pratt parser base class operating on a Pestle::Stream of token pairs.
+  class PrattParser[ExprT]
+    # A mapping of prefix operator rule symbols to precedence levels.
+    PREFIX_OPS: ::Hash[Symbol, Integer]
+
+    # A mapping of infix operator rule symbols to [precedence, right_associative].
+    INFIX_OPS: ::Hash[Symbol, [Integer, bool]]
+
+    # A mapping of postfix operator rule symbols to precedence levels.
+    POSTFIX_OPS: ::Hash[Symbol, Integer]
+
+    LEFT_ASSOC: false
+
+    RIGHT_ASSOC: true
+
+    def parse_primary: (Pair pair) -> ExprT
+
+    def parse_prefix: (Pair op, ExprT rhs) -> ExprT
+
+    def parse_infix: (ExprT lhs, Pair op, ExprT rhs) -> ExprT
+
+    def parse_postfix: (ExprT lhs, Pair op) -> ExprT
+
+    def parse_expr: (Stream stream, ?::Integer min_prec) -> ExprT
+  end
+end
