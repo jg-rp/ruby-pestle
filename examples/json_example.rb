@@ -84,7 +84,7 @@ START_RULE = :json
 # Very basic abstract syntax tree (AST) nodes.
 
 JSONObject = Struct.new("JSONObject", :items) do
-  def dumps = "{#{items.each.map { |k, v| "\"#{k}\": #{v.dumps}" }.join(",")}}"
+  def dumps = "{#{items.each.map { |k, v| "\"#{k}\":#{v.dumps}" }.join(",")}}"
 end
 
 JSONArray = Struct.new("JSONArray", :items) do
@@ -108,7 +108,7 @@ JSONNull = Struct.new("JSONNull") do
 end
 
 # JSON parser entry point.
-# @param data [String]
+# @param data [String] A JSON formatted string.
 # @return [JSONValue] One of the JSON nodes defined above.
 def parse_json(data)
   pair = PARSER.parse(START_RULE, data).first
@@ -135,5 +135,7 @@ def parse_json_value(pair)
   end
 end
 
-json = parse_json(EXAMPLE_JSON)
-puts json.dumps
+if __FILE__ == $PROGRAM_NAME
+  json = parse_json(EXAMPLE_JSON)
+  puts json.dumps
+end
