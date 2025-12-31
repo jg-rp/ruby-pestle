@@ -102,13 +102,13 @@ PRECEDENCES = {
   div: PREC_DIV,
   pow: PREC_POW,
   fac: PREC_FAC
-}
+}.freeze
 
-INFIX_OPS = Set.new(%i[add sub mul div pow])
+INFIX_OPS = Set.new(%i[add sub mul div pow]).freeze
 
-PREFIX_OPS = Set.new(%i[neg])
+PREFIX_OPS = Set.new(%i[neg]).freeze
 
-POSTFIX_OPS = Set.new(%i[fac])
+POSTFIX_OPS = Set.new(%i[fac]).freeze
 
 # Calculator expression parser entry point.
 # @param text [String]
@@ -208,8 +208,8 @@ def parse_basic_expr(pair)
     IntExpr.new(pair.text.to_i)
   in :ident, _
     VarExpr.new(pair.text)
-  in :expr, inner
-    parse_expr(inner.stream)
+  in :expr, _
+    parse_expr(pair.inner.stream)
   else
     raise "unexpected #{pair.text.inspect}"
   end

@@ -109,7 +109,7 @@ end
 
 # JSON parser entry point.
 # @param data [String] A JSON formatted string.
-# @return [JSONValue] One of the JSON nodes defined above.
+# @return [JSONValue] One of the JSON node structs defined above.
 def parse_json(data)
   pair = PARSER.parse(START_RULE, data).first
   parse_json_value(pair)
