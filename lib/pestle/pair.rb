@@ -273,6 +273,10 @@ module Pestle
       @pairs.first
     end
 
+    def pop
+      @pairs.pop
+    end
+
     def find_first_tagged(label)
       flatten.each do |pair|
         return pair if pair.tag == label

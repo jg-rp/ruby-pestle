@@ -137,7 +137,9 @@ module Pestle
 
     def flatten: () -> Enumerable[Pair]
 
-    def first: () -> Pair
+    def first: () -> Pair?
+             
+    def pop: () -> Pair?
 
     def find_first_tagged: (String label) -> (Pair | nil)
 

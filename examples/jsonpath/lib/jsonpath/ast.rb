@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Abstract syntax tree nodes for a JSONPath engine parsed with Pest for Ruby.
-module JSONPathPest::AST
+module JSONPathPest
   FilterContext = Data.define(:current, :root)
 
   ChildSegment = Data.define(:token, :selectors) do
