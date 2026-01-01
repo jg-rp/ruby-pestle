@@ -188,5 +188,97 @@ module JSONPathPest
     end
   end
 
-  # TODO: parse_comparable
+  def parse_comparable(pair)
+    case pair
+    in :number, _
+      parse_number(pair)
+    in :double_quoted, _
+      StringLiteral.new(pair, unescape(pair.text, '"'))
+    in :single_quoted, _
+      StringLiteral.new(pair, unescape(pair.text, "'"))
+    in :true_literal, _
+      BooleanLiteral.new(pair, true)
+    in :false_literal, _
+      BooleanLiteral.new(pair, false)
+    in :null, _
+      NullLiteral(pair)
+    in :rel_singular_query, children
+      RelativeQueryExpression(pair, children.map { |child| parse_segment(child) })
+    in :abs_singular_query, children
+      RootQueryExpression(pair, children.map { |child| parse_segment(child) })
+    in :function_expr, [name, *rest]
+      func_name = name.text
+      func = self::FUNCTION_EXTENSIONS[func_name]
+
+      unless func.class::RETURN_TYPE == :value_expression
+        raise "result of #{func_name} is not comparable"
+      end
+
+      args = rest.map { |pair| parse_function_argument(pair) }
+      assert_well_typed(name, func_name, func, args)
+      FunctionExpression.new(pair, func_name, args, func)
+    else
+      raise "expected a comparable"
+    end
+  end
+
+  def parse_number(pair)
+    case pair
+    in :number, [] | [[:int, _]]
+      IntegerLiteral.new(pair, pair.text.to_i)
+    in :number, [[:int, _], [:frac, _], *]
+      FloatLiteral.new(pair, pair.text.to_f)
+    in :number, [[:int, _], [:exp, _]]
+      if pair.children.last.text.include?("-")
+        FloatLiteral(pair, pair.text.to_f)
+      else
+        IntegerLiteral(pair, pair.text.to_f.to_i)
+      end
+    else
+      raise "expected a number"
+    end
+  end
+
+  def parse_function_argument(pair)
+    case pair
+    in :number, _
+      parse_number(pair)
+    in :double_quoted, _
+      StringLiteral.new(pair, unescape(pair.text, '"'))
+    in :single_quoted, _
+      StringLiteral.new(pair, unescape(pair.text, "'"))
+    in :true_literal, _
+      BooleanLiteral.new(pair, true)
+    in :false_literal, _
+      BooleanLiteral.new(pair, false)
+    in :null, _
+      NullLiteral(pair)
+    in :rel_singular_query, children
+      RelativeQueryExpression(pair, children.map { |child| parse_segment(child) })
+    in :abs_singular_query, children
+      RootQueryExpression(pair, children.map { |child| parse_segment(child) })
+    in :function_expr, [name, *rest]
+      func_name = name.text
+      func = self::FUNCTION_EXTENSIONS[func_name]
+      args = rest.map { |pair| parse_function_argument(pair) }
+      assert_well_typed(name, func_name, func, args)
+      FunctionExpression.new(pair, func_name, args, func)
+    in :logical_or_expression, _
+      parse_logical_or_expression(pair, func_expr: true)
+    in :logical_and_expression, _
+      parse_logical_and_expression(pair, func_expr: true)
+    else
+      raise "unexpected function argument #{pair.text.inspect}"
+    end
+  end
+
+  def i_json_int(pair)
+    i = pair.text.to_i
+    raise "index out of range" if i.nil? || i < self::MIN_INT_INDEX || i > self::MAX_INT_INDEX
+
+    i
+  end
+
+  def assert_well_typed(token, func_name, func_args, func)
+  end
 end
