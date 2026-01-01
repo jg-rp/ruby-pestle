@@ -40,12 +40,12 @@ module JSONPathPest
 
       if node.value.is_a?(Array)
         node.value.each_with_index do |value, i|
-          child = JSONPathNode.new(value, [node.location, i], node.root)
+          child = Node.new(value, [node.location, i], node.root)
           rv.concat(visit(child, depth + 1))
         end
       elsif node.value.is_a?(Hash)
         node.value.each do |key, value|
-          child = JSONPathNode.new(value, [node.location, key], node.root)
+          child = Node.new(value, [node.location, key], node.root)
           rv.concat(visit(child, depth + 1))
         end
       end
@@ -211,31 +211,35 @@ module JSONPathPest
   LogicalNotExpression = Data.define(:token, :expression) do
     def to_s = "!#{expression}"
 
-    def evaluate(context) = !truthy?(expression.evaluate(context))
+    def evaluate(context) = !JSONPathPest.truthy?(expression.evaluate(context))
   end
 
   LogicalAndExpression = Data.define(:token, :left, :right) do
     def to_s = "#{left} && #{right}"
 
-    def evaluate(context) = truthy?(left.evaluate(context)) && truthy?(right.evaluate(context))
+    def evaluate(context)
+      JSONPathPest.truthy?(left.evaluate(context)) && JSONPathPest.truthy?(right.evaluate(context))
+    end
   end
 
   LogicalOrExpression = Data.define(:token, :left, :right) do
     def to_s = "#{left} || #{right}"
 
-    def evaluate(context) = truthy?(left.evaluate(context)) || truthy?(right.evaluate(context))
+    def evaluate(context)
+      JSONPathPest.truthy?(left.evaluate(context)) || JSONPathPest.truthy?(right.evaluate(context))
+    end
   end
 
   EqExpression = Data.define(:token, :left, :right) do
     def to_s = "#{left} == #{right}"
 
-    def evaluate(context) = eq?(left.evaluate(context), right.evaluate(context))
+    def evaluate(context) = JSONPathPest.eq?(left.evaluate(context), right.evaluate(context))
   end
 
   NeExpression = Data.define(:token, :left, :right) do
     def to_s = "#{left} != #{right}"
 
-    def evaluate(context) = !eq?(left.evaluate(context), right.evaluate(context))
+    def evaluate(context) = !JSONPathPest.eq?(left.evaluate(context), right.evaluate(context))
   end
 
   LeExpression = Data.define(:token, :left, :right) do
@@ -244,7 +248,7 @@ module JSONPathPest
     def evaluate(context)
       lhs = left.evaluate(context)
       rhs = right.evaluate(context)
-      eq?(lhs, rhs) || lt?(lhs, rhs)
+      JSONPathPest.eq?(lhs, rhs) || JSONPathPest.lt?(lhs, rhs)
     end
   end
 
@@ -254,20 +258,20 @@ module JSONPathPest
     def evaluate(context)
       lhs = left.evaluate(context)
       rhs = right.evaluate(context)
-      eq?(lhs, rhs) || lt?(rhs, lhs)
+      JSONPathPest.eq?(lhs, rhs) || JSONPathPest.lt?(rhs, lhs)
     end
   end
 
   LtExpression = Data.define(:token, :left, :right) do
     def to_s = "#{left} < #{right}"
 
-    def evaluate(context) = lt?(left.evaluate(context), right.evaluate(context))
+    def evaluate(context) = JSONPathPest.lt?(left.evaluate(context), right.evaluate(context))
   end
 
   GtExpression = Data.define(:token, :left, :right) do
     def to_s = "#{left} > #{right}"
 
-    def evaluate(context) = lt?(right.evaluate(context), left.evaluate(context))
+    def evaluate(context) = JSONPathPest.lt?(right.evaluate(context), left.evaluate(context))
   end
 
   RelativeQueryExpression = Data.define(:token, :query) do
@@ -275,10 +279,10 @@ module JSONPathPest
 
     def evaluate(context)
       unless context.current.is_a?(Array) || context.current.is_a?(Hash)
-        return @query.empty? ? context.current : JSONPathPest::NodeList.new
+        return query.empty? ? context.current : JSONPathPest::NodeList.new
       end
 
-      @query.find(context.current)
+      query.find(context.current)
     end
   end
 
@@ -302,19 +306,19 @@ module JSONPathPest
     def unpack_node_lists(args_)
       unpacked_args = []
       args_.each_with_index do |arg, i|
-        unless arg.is_a?(JSONPathPest::NodeList) && func.class::ARG_TYPES[i] != :nodes_expression
-          unpacked_args << arg
+        if arg.is_a?(JSONPathPest::NodeList) && func.class::ARG_TYPES[i] != :nodes_expression
+          unpacked_args << case arg.length
+                           when 0
+                             :nothing
+                           when 1
+                             arg.first.value
+                           else
+                             arg
+                           end
           next
         end
 
-        unpacked_args << case arg.length
-                         when 0
-                           :nothing
-                         when 1
-                           arg.first.value
-                         else
-                           arg
-                         end
+        unpacked_args << arg
       end
       unpacked_args
     end

@@ -19,5 +19,7 @@ module JSONPathPest
       end
       true
     end
+
+    def empty? = segments.empty?
   end
 end

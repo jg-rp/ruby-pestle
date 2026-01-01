@@ -99,7 +99,7 @@ module JSONPathPest
   def self.parse_slice_selector(pair)
     start = nil
     stop = nil
-    step = nil
+    step = 1
 
     pair.each do |child|
       case child.rule
@@ -179,9 +179,9 @@ module JSONPathPest
   def self.parse_test_expression(pair)
     case pair
     in :rel_query, children
-      RelativeQueryExpression(pair, children.map { |child| parse_segment(child) })
+      RelativeQueryExpression.new(pair, Query.new(children.map { |child| parse_segment(child) }))
     in :root_query, children
-      RootQueryExpression(pair, children.map { |child| parse_segment(child) })
+      RootQueryExpression.new(pair, Query.new(children.map { |child| parse_segment(child) }))
     in :function_expr, [name, *rest]
       func_name = name.text
       func = self::FUNCTION_EXTENSIONS[func_name]
@@ -206,11 +206,11 @@ module JSONPathPest
     in :false_literal, _
       BooleanLiteral.new(pair, false)
     in :null, _
-      NullLiteral(pair)
+      NullLiteral.new(pair)
     in :rel_singular_query, children
-      RelativeQueryExpression(pair, children.map { |child| parse_segment(child) })
+      RelativeQueryExpression.new(pair, Query.new(children.map { |child| parse_segment(child) }))
     in :abs_singular_query, children
-      RootQueryExpression(pair, children.map { |child| parse_segment(child) })
+      RootQueryExpression.new(pair, Query.new(children.map { |child| parse_segment(child) }))
     in :function_expr, [name, *rest]
       func_name = name.text
       func = self::FUNCTION_EXTENSIONS[func_name]
@@ -235,9 +235,9 @@ module JSONPathPest
       FloatLiteral.new(pair, pair.text.to_f)
     in :number, [[:int, _], [:exp, _]]
       if pair.children.last.text.include?("-")
-        FloatLiteral(pair, pair.text.to_f)
+        FloatLiteral.new(pair, pair.text.to_f)
       else
-        IntegerLiteral(pair, pair.text.to_f.to_i)
+        IntegerLiteral.new(pair, pair.text.to_f.to_i)
       end
     else
       raise "expected a number"
@@ -257,34 +257,34 @@ module JSONPathPest
     in :false_literal, _
       BooleanLiteral.new(pair, false)
     in :null, _
-      NullLiteral(pair)
-    in :rel_singular_query, children
-      RelativeQueryExpression(pair, children.map { |child| parse_segment(child) })
-    in :abs_singular_query, children
-      RootQueryExpression(pair, children.map { |child| parse_segment(child) })
+      NullLiteral.new(pair)
+    in :rel_query, children
+      RelativeQueryExpression.new(pair, Query.new(children.map { |child| parse_segment(child) }))
+    in :root_query, children
+      RootQueryExpression.new(pair, Query.new(children.map { |child| parse_segment(child) }))
     in :function_expr, [name, *rest]
       func_name = name.text
       func = self::FUNCTION_EXTENSIONS[func_name]
       args = rest.map { |pair| parse_function_argument(pair) }
       assert_well_typed(name, func_name, func, args)
       FunctionExpression.new(pair, func_name, args, func)
-    in :logical_or_expression, _
+    in :logical_or_expr, _
       parse_logical_or_expression(pair, func_expr: true)
-    in :logical_and_expression, _
+    in :logical_and_expr, _
       parse_logical_and_expression(pair, func_expr: true)
     else
-      raise "unexpected function argument #{pair.text.inspect}"
+      raise "unexpected function argument #{pair.rule} -> #{pair.text.inspect}"
     end
   end
 
-  def self.i_json_int(pair)
-    i = pair.text.to_i
+  def self.i_json_int(str)
+    i = str.to_i
     raise "index out of range" if i.nil? || i < self::MIN_INT_INDEX || i > self::MAX_INT_INDEX
 
     i
   end
 
-  def self.assert_well_typed(func_name, func_args, func)
+  def self.assert_well_typed(func_name, func, func_args)
     unless func_args.length == func.class::ARG_TYPES.length
       plural = func.class::ARG_TYPES.length == 1 ? "" : "s"
       raise "#{func_name}() requires #{func.class::ARG_TYPES.length} argument#{plural}"
@@ -334,5 +334,88 @@ module JSONPathPest
 
   def self.canonical_string(value)
     "'#{(JSON.dump(value)[1..-2] || raise).gsub(/('|\\")/, TRANS)}'"
+  end
+
+  RE_SLASH_U = /\\u([0-9a-fA-F]{4})/
+
+  def self.unescape(value, quote)
+    unescaped = [] # : Array[String]
+    scanner = StringScanner.new(value)
+
+    until scanner.eos?
+      if scanner.scan(RE_SLASH_U)
+        code_point = (scanner.captures&.first || raise).to_i(16)
+        raise "unexpected low surrogate" if low_surrogate?(code_point)
+
+        unless high_surrogate?(code_point)
+          unescaped << code_point.chr(Encoding::UTF_8)
+          next
+        end
+
+        raise "expected a low surrogate" unless scanner.scan(RE_SLASH_U)
+
+        low_surrogate = (scanner.captures&.first || raise).to_i(16)
+        raise "unexpected code point" unless low_surrogate?(low_surrogate)
+
+        code_point = 0x10000 + (
+          ((code_point & 0x03FF) << 10) | (low_surrogate & 0x03FF)
+        )
+
+        unescaped << code_point.chr(Encoding::UTF_8)
+        next
+      end
+
+      ch = scanner.getch
+
+      break if ch.nil?
+
+      unless ch == "\\"
+        unescaped << ch
+        next
+      end
+
+      ch = scanner.getch
+
+      case ch
+      when quote
+        unescaped << quote
+      when "\\"
+        unescaped << "\\"
+      when "/"
+        unescaped << "/"
+      when "b"
+        unescaped << "\x08"
+      when "f"
+        unescaped << "\x0c"
+      when "n"
+        unescaped << "\n"
+      when "r"
+        unescaped << "\r"
+      when "t"
+        unescaped << "\t"
+      when nil
+        raise "incomplete escape sequence"
+      else
+        raise "unknown escape sequence"
+      end
+    end
+
+    unescaped.join
+  end
+
+  def self.high_surrogate?(code_point)
+    code_point.between?(0xD800, 0xDBFF)
+  end
+
+  def self.low_surrogate?(code_point)
+    code_point.between?(0xDC00, 0xDFFF)
+  end
+
+  def self.find(path, data)
+    parse(path).find(data)
+  end
+
+  def self.compile(path)
+    parse(path)
   end
 end
