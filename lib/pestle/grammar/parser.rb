@@ -278,7 +278,7 @@ module Pestle::Grammar
       PeekSlice.new(start, stop, tag: tag)
     end
 
-    RE_SLASH_X = /\\x\{([0-9a-fA-F]{2})\}/
+    RE_SLASH_X = /\\x([0-9a-fA-F]{2})/
     RE_SLASH_U = /\\u\{([0-9a-fA-F]{2,6})\}/
 
     def unescape(value, token)
@@ -287,12 +287,12 @@ module Pestle::Grammar
 
       until scanner.eos?
         if scanner.scan(RE_SLASH_X)
-          unescaped << (scanner.captures&.first || raise).to_i(16).chr
+          unescaped << (scanner.captures&.first || raise).to_i(16).chr(Encoding::UTF_8)
           next
         end
 
         if scanner.scan(RE_SLASH_U)
-          unescaped << (scanner.captures&.first || raise).to_i(16).chr
+          unescaped << (scanner.captures&.first || raise).to_i(16).chr(Encoding::UTF_8)
           next
         end
 

@@ -43,6 +43,9 @@ module Pestle::Grammar
       matched = @expression.parse(state, [])
       state.restore
 
+      # TODO: remove this
+      # TODO: have terminals call state.record_failure if the current neg_pred depth is odd
+
       if matched
         if @expression.is_a?(Identifier)
           label = state.rules[@expression.value].children.first.to_s # steep:ignore

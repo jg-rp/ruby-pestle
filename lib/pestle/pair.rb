@@ -115,6 +115,8 @@ module Pestle
       @tag = tag
       @rule = rule_name.to_sym
       @name = rule_name
+
+      @children.freeze
     end
 
     def deconstruct
