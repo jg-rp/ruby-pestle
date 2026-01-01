@@ -40,12 +40,12 @@ module JSONPathPest
 
       if node.value.is_a?(Array)
         node.value.each_with_index do |value, i|
-          child = Node.new(value, [node.location, i], node.root)
+          child = Node.new(value, node.location + [i], node.root)
           rv.concat(visit(child, depth + 1))
         end
       elsif node.value.is_a?(Hash)
         node.value.each do |key, value|
-          child = Node.new(value, [node.location, key], node.root)
+          child = Node.new(value, node.location + [key], node.root)
           rv.concat(visit(child, depth + 1))
         end
       end
@@ -149,7 +149,7 @@ module JSONPathPest
   FilterExpression = Data.define(:token, :expression) do
     def to_s = to_canonical_string(expression, 1)
 
-    def evaluate(context) = truthy?(expression.evaluate(context))
+    def evaluate(context) = JSONPathPest.truthy?(expression.evaluate(context))
 
     private
 

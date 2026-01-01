@@ -88,7 +88,7 @@ module JSONPathPest
     in :index_selector, _
       IndexSelector.new(pair, i_json_int(pair.text))
     in :filter_selector, [expression]
-      FilterSelector.new(pair, parse_logical_or_expression(expression))
+      FilterSelector.new(pair, FilterExpression.new(pair, parse_logical_or_expression(expression)))
     in :member_name_shorthand, _
       NameSelector.new(pair, pair.text)
     else
