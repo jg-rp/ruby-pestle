@@ -38,26 +38,11 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
-      state.neg_pred_depth += 1
+      state.neg_pred_stack << state.scanner.pos
       state.checkpoint
       matched = @expression.parse(state, [])
       state.restore
-
-      # TODO: remove this
-      # TODO: have terminals call state.record_failure if the current neg_pred depth is odd
-
-      if matched
-        if @expression.is_a?(Identifier)
-          label = state.rules[@expression.value].children.first.to_s # steep:ignore
-          state.record_failure(label, @expression.value, force: true) # steep:ignore
-        elsif @expression.is_a?(Rule)
-          state.record_failure(@expression.children.first.to_s, @expression.name, force: true) # steep:ignore
-        else
-          state.record_failure(@expression.to_s, state.rule_stack.last, force: true)
-        end
-      end
-
-      state.neg_pred_depth -= 1
+      state.neg_pred_stack.pop
       !matched
     end
 

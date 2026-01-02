@@ -13,7 +13,9 @@ module Pestle::Grammar
     def to_s = "ANY"
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
-      !state.scanner.getch.nil?
+      matched = !state.scanner.getch.nil?
+      state.track("ANY", matched)
+      matched
     end
   end
 
@@ -29,7 +31,9 @@ module Pestle::Grammar
     def to_s = "SOI"
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
-      state.scanner.pos.zero?
+      matched = state.scanner.pos.zero?
+      state.track("SOI", matched)
+      matched
     end
   end
 
@@ -45,7 +49,9 @@ module Pestle::Grammar
     def to_s = "EOI"
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
-      state.scanner.eos?
+      matched = state.scanner.eos?
+      state.track("EOI", matched)
+      matched
     end
   end
 

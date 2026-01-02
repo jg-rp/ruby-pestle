@@ -17,7 +17,9 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
-      !state.scanner.scan(@re).nil?
+      matched = !state.scanner.scan(@re).nil?
+      state.track(to_s, matched)
+      matched
     end
   end
 end

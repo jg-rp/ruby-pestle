@@ -4,8 +4,8 @@ module Pestle
   # Pest parser state.
   class ParserState
     attr_reader :text, :scanner, :rules, :user_stack, :tags, :atomic_depth, :rule_stack,
-                :furthest_pos, :furthest_expected, :furthest_unexpected, :furthest_rules
-    attr_accessor :neg_pred_depth
+                :furthest_pos, :furthest_expected, :furthest_unexpected, :furthest_rules,
+                :neg_pred_stack
 
     # @param text [String] Source text to be parsed into nested token pairs.
     # @param start_pos [Integer] A byte offset from which to start scanning `text`.
@@ -15,26 +15,25 @@ module Pestle
 
       @scanner = StringScanner.new(text)
       @scanner.pos = start_pos
-      @pos_checkpoints = [] # : Array[Integer]
+      @pos_checkpoints = []
 
       @atomic_depth = 0
-      @atomic_depth_checkpoints = [] # : Array[Integer]
+      @atomic_depth_checkpoints = []
 
       # A stack of grammar-defined expression tags.
-      @tags = [] # : Array[String]
+      @tags = []
 
-      @user_stack = [] # : Array[String]
-      @user_stack_popped = [] # : Array[String]
-      @user_stack_lengths = [] # : Array[[Integer, Integer]]
+      @user_stack = []
+      @user_stack_popped = []
+      @user_stack_lengths = []
 
       # Furthest failure tracking for error reporting.
-      @suppress_failures = false
-      @rule_stack = [] # : Array[String]
-      @neg_pred_depth = 0
+      @rule_stack = []
+      @neg_pred_stack = []
       @furthest_pos = -1
-      @furthest_rules = [] # : Array[String]
-      @furthest_expected = {} # : Hash[String, Array[String]]
-      @furthest_unexpected = {} # : Hash[String, Array[String]]
+      @furthest_rules = []
+      @furthest_expected = {}
+      @furthest_unexpected = {}
     end
 
     def checkpoint
@@ -142,15 +141,12 @@ module Pestle
       return false unless whitespace_rule || comment_rule
 
       children = [] # : Array[Pestle::Pair]
-      some = false
 
-      # TODO: suppress failures
       loop do
         matched = false
 
         unless whitespace_rule.nil?
           if whitespace_rule.parse(self, children)
-            some = true
             matched = true
             pairs.concat(children)
           end
@@ -159,7 +155,6 @@ module Pestle
 
         unless comment_rule.nil?
           if comment_rule.parse(self, children)
-            some = true
             matched = true
             pairs.concat(children)
           end
@@ -169,7 +164,7 @@ module Pestle
         break unless matched
       end
 
-      some
+      true # Always succeed
     end
 
     def with_tag(name)
@@ -192,16 +187,19 @@ module Pestle
       @atomic_depth = @atomic_depth_checkpoints.pop || raise
     end
 
-    # Record a terminal expression failure for error reporting.
-    def record_failure(label, rule_name = nil, force: false)
-      return if @suppress_failures || (@neg_pred_depth.positive? && !force)
+    # Record a terminal expression failures for error reporting.
+    def track(label, matched)
+      neg_pred_context = @neg_pred_stack.length.odd?
 
-      rule_name ||= @rule_stack.last
+      return unless (neg_pred_context && matched) || (!neg_pred_context && !matched)
 
-      if @scanner.pos > @furthest_pos
-        @furthest_pos = @scanner.pos
+      rule_name = @rule_stack.last
+      pos = neg_pred_context ? @neg_pred_stack.last : @scanner.pos
+
+      if pos > @furthest_pos
+        @furthest_pos = pos
         @furthest_rules = @rule_stack.dup
-        if @neg_pred_depth.odd?
+        if neg_pred_context
           @furthest_unexpected = { rule_name => [label] }
           @furthest_expected = {} # : Hash[String, Array[String]]
         else
@@ -209,7 +207,7 @@ module Pestle
           @furthest_expected = { rule_name => [label] }
         end
       elsif @scanner.pos == @furthest_pos
-        target = @neg_pred_depth.odd? ? @furthest_unexpected : @furthest_expected
+        target = neg_pred_context ? @furthest_unexpected : @furthest_expected
 
         if target.member?(rule_name)
           target[rule_name] << label

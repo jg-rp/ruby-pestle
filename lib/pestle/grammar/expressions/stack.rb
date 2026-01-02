@@ -63,9 +63,11 @@ module Pestle::Grammar
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       start_pos = state.scanner.pos
       state.stack_peek_slice(@start, @stop).each do |s|
-        next unless state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
+        matched = !state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
+        state.track(s, matched)
 
-        state.record_failure(s)
+        next if matched
+
         state.scanner.pos = start_pos
         return false
       end
@@ -81,18 +83,13 @@ module Pestle::Grammar
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       peeked = state.stack_peek
+      state.track("PEEK", !peeked.nil?)
 
-      if peeked.nil?
-        state.record_failure("PEEK")
-        return false
-      end
+      return false if peeked.nil?
 
-      if state.scanner.scan(peeked).nil? # steep:ignore ArgumentTypeMismatch
-        state.record_failure(peeked)
-        false
-      else
-        true
-      end
+      matched = !state.scanner.scan(peeked).nil? # steep:ignore ArgumentTypeMismatch
+      state.track(peeked, matched)
+      matched
     end
   end
 
@@ -106,8 +103,10 @@ module Pestle::Grammar
       children = [] # : Array[Pestle::Pair]
 
       state.user_stack.reverse_each.with_index do |s, i|
-        if state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
-          state.record_failure(s)
+        matched = !state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
+        state.track(s, matched)
+
+        unless matched
           state.scanner.pos = start_pos
           return false
         end
@@ -127,15 +126,18 @@ module Pestle::Grammar
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       peeked = state.stack_peek
-      state.record_failure("POP")
+      state.track("POP", !peeked.nil?)
+
       return false if peeked.nil?
 
-      if state.scanner.scan(peeked).nil? # steep:ignore ArgumentTypeMismatch
-        state.record_failure(peeked)
-        false
-      else
+      matched = !state.scanner.scan(peeked).nil? # steep:ignore ArgumentTypeMismatch
+      state.track(peeked, matched)
+
+      if matched
         state.stack_pop
         true
+      else
+        false
       end
     end
   end
@@ -150,8 +152,10 @@ module Pestle::Grammar
       children = [] # : Array[Pestle::Pair]
 
       state.user_stack.reverse_each.with_index do |s, i|
-        if state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
-          state.record_failure(s)
+        matched = !state.scanner.scan(s).nil? # steep:ignore ArgumentTypeMismatch
+        state.track(s, matched)
+
+        unless matched
           state.scanner.pos = start_pos
           return false
         end
@@ -171,12 +175,9 @@ module Pestle::Grammar
     end
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
-      if state.stack_pop.nil?
-        state.record_failure("DROP")
-        false
-      else
-        true
-      end
+      matched = !state.stack_pop.nil?
+      state.track("DROP", matched)
+      matched
     end
   end
 end

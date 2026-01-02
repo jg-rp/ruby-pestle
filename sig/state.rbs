@@ -22,9 +22,7 @@ module Pestle
 
     @rule_stack: Array[String]
 
-    @neg_pred_depth: Integer
-
-    @suppress_failures: bool
+    @neg_pred_stack: Array[Integer]
 
     @furthest_pos: Integer
 
@@ -56,7 +54,7 @@ module Pestle
     
     attr_reader furthest_rules: Array[String]
 
-    attr_accessor neg_pred_depth: Integer
+    attr_reader neg_pred_stack: Array[Integer]
 
     def initialize: (String text, Hash[String, Pestle::Grammar::Rule] rules, ?start_pos: ::Integer) -> void
 
@@ -92,6 +90,6 @@ module Pestle
               
     def nonatomic: () { () -> untyped } -> untyped
                  
-    def record_failure: (String label, ?String? rule_name, ?force: bool) -> void
+    def track: (String label, bool matched) -> void
   end
 end

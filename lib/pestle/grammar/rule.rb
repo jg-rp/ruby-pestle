@@ -18,7 +18,7 @@ module Pestle::Grammar
       super(tag: nil)
       @name = name
       @expression = expression
-      @modifier = modifier
+      @modifier = %w[COMMENT WHITESPACE].include?(name) ? modifier | ATOMIC : modifier
       @doc = doc
     end
 
@@ -41,12 +41,12 @@ module Pestle::Grammar
 
     def parse(state, pairs)
       start_pos = state.scanner.pos
-      children = [] # : Array[Pestle::Pair]
+      silent = @modifier.anybits?(SILENT)
+      state.rule_stack << @name unless silent
+
       matched = false
+      children = [] # : Array[Pestle::Pair]
 
-      state.rule_stack << @name
-
-      # TODO: ensure COMMENT and WHITESPACE are atomic during parsing
       if @modifier.anybits?(ATOMIC | COMPOUND)
         state.atomic do
           matched = @expression.parse(state, children)
@@ -59,12 +59,12 @@ module Pestle::Grammar
         matched = @expression.parse(state, children)
       end
 
-      state.rule_stack.pop
+      state.rule_stack.pop unless silent
       tag = state.tags.pop
 
       return false unless matched
 
-      if @modifier.anybits?(SILENT)
+      if silent
         pairs.concat(children)
         return true
       end
