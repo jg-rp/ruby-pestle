@@ -27,9 +27,11 @@ module JSONPathPest
   MAX_INT_INDEX = (2**53) - 1
   MIN_INT_INDEX = -(2**53) + 1
 
+  # @param query [String] A JSONPath query string.
+  # @return [Query] A compiled JSONPath query.
   def self.parse(query)
     pairs = self::PEST_PARSER.parse(self::START_RULE, query)
-    segments = []
+    segments = [] # : Array[ChildSegment | DescendantSegment]
 
     pairs.each do |pair|
       case pair
@@ -49,6 +51,8 @@ module JSONPathPest
     Query.new(segments)
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [Segment]
   def self.parse_segment(pair)
     case pair
     in :child_segment, [inner]
@@ -62,6 +66,8 @@ module JSONPathPest
     end
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [Array[Selector]]
   def self.parse_segment_inner(pair)
     case pair
     in :bracketed_selection, selectors
@@ -75,6 +81,8 @@ module JSONPathPest
     end
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [Selector]
   def self.parse_selector(pair)
     case pair
     in :double_quoted, _
@@ -96,6 +104,8 @@ module JSONPathPest
     end
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [SliceSelector]
   def self.parse_slice_selector(pair)
     start = nil
     stop = nil
@@ -117,6 +127,8 @@ module JSONPathPest
     SliceSelector.new(pair, start, stop, step)
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [Expression]
   def self.parse_logical_or_expression(pair, func_expr: false)
     first, *rest = pair.children
     init = parse_logical_and_expression(first, func_expr: func_expr)
@@ -128,6 +140,8 @@ module JSONPathPest
     end
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [Expression]
   def self.parse_logical_and_expression(pair, func_expr: false)
     first, *rest = pair.children
     init = parse_basic_expression(first)
@@ -141,6 +155,8 @@ module JSONPathPest
     end
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [Expression]
   def self.parse_basic_expression(pair)
     case pair
     in :paren_expr, [not_expr, or_expr]
@@ -176,6 +192,8 @@ module JSONPathPest
     end
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [Expression]
   def self.parse_test_expression(pair)
     case pair
     in :rel_query, children
@@ -193,6 +211,8 @@ module JSONPathPest
     end
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [Expression]
   def self.parse_comparable(pair)
     case pair
     in :number, _
@@ -227,6 +247,8 @@ module JSONPathPest
     end
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [IntegerLiteral | FloatLiteral]
   def self.parse_number(pair)
     case pair
     in :number, [] | [[:int, _]]
@@ -244,6 +266,8 @@ module JSONPathPest
     end
   end
 
+  # @param pair [Pestle::Pair]
+  # @return [Expression]
   def self.parse_function_argument(pair)
     case pair
     in :number, _
@@ -277,6 +301,8 @@ module JSONPathPest
     end
   end
 
+  # @param str [String]
+  # @return [Integer]
   def self.i_json_int(str)
     i = str.to_i
     raise "index out of range" if i.nil? || i < self::MIN_INT_INDEX || i > self::MAX_INT_INDEX
@@ -338,6 +364,7 @@ module JSONPathPest
 
   RE_SLASH_U = /\\u([0-9a-fA-F]{4})/
 
+  # Return `value` with escape sequences replaced with Unicode characters.
   def self.unescape(value, quote)
     unescaped = [] # : Array[String]
     scanner = StringScanner.new(value)
