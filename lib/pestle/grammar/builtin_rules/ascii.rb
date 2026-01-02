@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Pest grammar parsing and evaluation.
 module Pestle::Grammar
   # A builtin rule matching ASCII character ranges.
   class ASCIIRule < BuiltInRule

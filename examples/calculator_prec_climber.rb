@@ -32,6 +32,7 @@
 
 require_relative "../lib/pestle"
 
+# Example calculator parser using a precedence climbing technique to handle operator precedence.
 module PrecClimberExample
   GRAMMAR = <<~'GRAMMAR'
     WHITESPACE   =  _{ " " | "\t" | NEWLINE }

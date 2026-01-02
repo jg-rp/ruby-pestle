@@ -13,6 +13,7 @@ require_relative "expressions/stack"
 require_relative "expressions/string"
 require_relative "rule"
 
+# Pest grammar parsing and evaluation.
 module Pestle::Grammar
   # Pest grammar parser.
   class Parser

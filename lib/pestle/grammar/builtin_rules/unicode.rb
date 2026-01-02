@@ -287,7 +287,5 @@ module Pestle::Grammar
       key = n.upcase.sub("-", "_")
       [key, UnicodeRule.new(key, /\p{#{n}}/)]
     end
-  }
-
-  UNICODE_RULES.freeze
+  }.freeze # steep:ignore
 end

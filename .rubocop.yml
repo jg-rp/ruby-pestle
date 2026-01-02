@@ -43,6 +43,12 @@ Metrics/ClassLength:
 Metrics/BlockLength:
   Enabled: false
 
+Naming/PredicateMethod:
+  Enabled: false
+
+Naming/MethodParameterName:
+  AllowedNames: [op, re]
+
 Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true
 

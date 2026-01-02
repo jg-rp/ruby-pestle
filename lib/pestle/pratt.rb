@@ -4,13 +4,13 @@ module Pestle
   # A Generic Pratt parser base class operating on a Pestle::Stream of token pairs.
   class PrattParser
     # A mapping of prefix operator rule symbols to precedence levels.
-    PREFIX_OPS = {} # : Hash[Symbol, Integer]
+    PREFIX_OPS = {}.freeze # steep:ignore
 
     # A mapping of infix operator rule symbols to [precedence, right_associative].
-    INFIX_OPS = {} # : Hash[Symbol, [Integer, bool]]
+    INFIX_OPS = {}.freeze # steep:ignore
 
     # A mapping of postfix operator rule symbols to precedence levels.
-    POSTFIX_OPS = {} # : Hash[Symbol, Integer]
+    POSTFIX_OPS = {}.freeze # steep:ignore
 
     LEFT_ASSOC = false
     RIGHT_ASSOC = true

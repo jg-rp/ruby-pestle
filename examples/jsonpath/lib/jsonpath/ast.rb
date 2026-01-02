@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Abstract syntax tree nodes for a JSONPath engine parsed with Pest for Ruby.
+# JSONPath RFC 9535 parsing with Pestle (Pest for Ruby).
 module JSONPathPest
   FilterContext = Data.define(:current, :root)
 
@@ -181,31 +181,31 @@ module JSONPathPest
   BooleanLiteral = Data.define(:token, :value) do
     def to_s = value.to_s
 
-    def evaluate(context) = value
+    def evaluate(context) = value # rubocop: disable Lint/UnusedMethodArgument
   end
 
   StringLiteral = Data.define(:token, :value) do
     def to_s = canonical_string(value)
 
-    def evaluate(context) = value
+    def evaluate(context) = value # rubocop: disable Lint/UnusedMethodArgument
   end
 
   IntegerLiteral = Data.define(:token, :value) do
     def to_s = value
 
-    def evaluate(context) = value
+    def evaluate(context) = value # rubocop: disable Lint/UnusedMethodArgument
   end
 
   FloatLiteral = Data.define(:token, :value) do
     def to_s = value
 
-    def evaluate(context) = value
+    def evaluate(context) = value # rubocop: disable Lint/UnusedMethodArgument
   end
 
   NullLiteral = Data.define(:token) do
     def to_s = "null"
 
-    def evaluate(context) = nil
+    def evaluate(context) = nil # rubocop: disable Lint/UnusedMethodArgument
   end
 
   LogicalNotExpression = Data.define(:token, :expression) do

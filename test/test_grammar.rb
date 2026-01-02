@@ -820,7 +820,7 @@ class TestGrammar < Minitest::Test
     assert_equal(want, PARSER.parse("peek_all", "0110").dump)
   end
 
-  def test_peek_slice_23
+  def test_peek_slice
     want = [
       {
         "rule" => "peek_slice_23",

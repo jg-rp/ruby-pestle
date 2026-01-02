@@ -26,11 +26,11 @@ module Pestle
       @state = state
     end
 
-    def detailed_message(highlight: true, **kwargs)
+    def detailed_message(highlight: true, **_kwargs)
       line, col, current_line = error_context(@state.text, @state.furthest_pos)
 
       pad = " " * line.to_s.length
-      pointer = (" " * (col - 1)) + "^"
+      pointer = "#{" " * (col - 1)}^"
       no_pointer = " " * col
       rule_stack = @state.furthest_rules.join(" > ")
 

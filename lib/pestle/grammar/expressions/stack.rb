@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Pestle::Grammar
+  # A PUSH terminal with a string literal argument.
   class PushLiteral < Terminal
     attr_reader :value
 
@@ -19,6 +20,7 @@ module Pestle::Grammar
     end
   end
 
+  # A PUSH terminal with an expression.
   class Push < Expression
     attr_reader :expression
 
@@ -47,6 +49,8 @@ module Pestle::Grammar
     def children = [@expression]
   end
 
+  # A PEEK terminal with a range expression.
+  # Matches the range from the bottom of the stack to the top.
   class PeekSlice < Terminal
     attr_reader :start, :stop
 
@@ -76,6 +80,7 @@ module Pestle::Grammar
     end
   end
 
+  # A PEEK terminal looking at the top of the stack.
   class Peek < Terminal
     def to_s
       "#{tag_s}PEEK"
@@ -93,6 +98,7 @@ module Pestle::Grammar
     end
   end
 
+  # A PEEK_ALL terminal matching the entire stack, top to bottom.
   class PeekAll < Terminal
     def to_s
       "#{tag_s}PEEK_ALL"
@@ -119,6 +125,7 @@ module Pestle::Grammar
     end
   end
 
+  # A POP terminal popping off the top of the stack.
   class Pop < Terminal
     def to_s
       "#{tag_s}POP"
@@ -142,6 +149,7 @@ module Pestle::Grammar
     end
   end
 
+  # A POP_ALL terminal matching the entire stack, top to bottom.
   class PopAll < Terminal
     def to_s
       "#{tag_s}POP_ALL"
@@ -169,6 +177,7 @@ module Pestle::Grammar
     end
   end
 
+  # A DROP terminal that matches if the stack is not empty.
   class Drop < Terminal
     def to_s
       "#{tag_s}DROP"

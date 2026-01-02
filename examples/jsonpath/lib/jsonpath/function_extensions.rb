@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# JSONPath RFC 9535 parsing with Pestle (Pest for Ruby).
 module JSONPathPest
   # The standard `count` function.
   class CountFunctionExtension

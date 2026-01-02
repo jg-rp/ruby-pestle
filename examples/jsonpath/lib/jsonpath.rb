@@ -128,6 +128,7 @@ module JSONPathPest
   end
 
   # @param pair [Pestle::Pair]
+  # @param func_expr [bool] true if the expression is part of a function call, false otherwise.
   # @return [Expression]
   def self.parse_logical_or_expression(pair, func_expr: false)
     first, *rest = pair.children
@@ -141,6 +142,7 @@ module JSONPathPest
   end
 
   # @param pair [Pestle::Pair]
+  # @param func_expr [bool] true if the expression is part of a function call, false otherwise.
   # @return [Expression]
   def self.parse_logical_and_expression(pair, func_expr: false)
     first, *rest = pair.children
@@ -444,5 +446,9 @@ module JSONPathPest
 
   def self.compile(path)
     parse(path)
+  end
+
+  def self.pest_parse(path)
+    self::PEST_PARSER.parse(self::START_RULE, path)
   end
 end

@@ -13,7 +13,7 @@ module Pestle::Grammar
       @source = source
     end
 
-    def detailed_message(highlight: true, **kwargs)
+    def detailed_message(highlight: true, **_kwargs)
       _kind, value, index = @token || raise
       line, col, current_line = error_context(@source || raise, index)
       name_and_position = "#{current_line.inspect}:#{line}:#{col}"

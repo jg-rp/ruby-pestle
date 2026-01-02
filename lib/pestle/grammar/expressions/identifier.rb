@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Pestle::Grammar
+  # A terminal pointing to a rule, either a grammar rule or a built-in rule.
   class Identifier < Terminal
     attr_reader :value
 

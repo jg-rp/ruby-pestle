@@ -59,5 +59,5 @@ module Pestle::Grammar
     "ANY" => Any.new,
     "SOI" => SOI.new,
     "EOI" => EOI.new
-  }
+  }.freeze # steep:ignore
 end
