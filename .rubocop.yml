@@ -16,6 +16,9 @@ Style/StringLiteralsInInterpolation:
 Style/ClassAndModuleChildren:
   Enabled: false
 
+Style/FormatStringToken:
+  Enabled: false
+
 Layout/LineLength:
   Max: 100
 

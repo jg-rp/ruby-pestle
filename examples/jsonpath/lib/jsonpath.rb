@@ -3,7 +3,6 @@
 require "pathname"
 require_relative "../../../lib/pestle"
 require_relative "jsonpath/ast"
-require_relative "jsonpath/errors"
 require_relative "jsonpath/function_extensions"
 require_relative "jsonpath/node"
 require_relative "jsonpath/query"

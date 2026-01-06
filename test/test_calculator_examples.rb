@@ -2,6 +2,7 @@
 
 require_relative "../examples/calculator_prec_climber"
 require_relative "../examples/calculator_pratt"
+require_relative "../examples/calculator_stack_vm"
 
 class TestCalculatorExample < Minitest::Test
   PRATT_PARSER = PrattExample::CalculatorParser.new
@@ -14,6 +15,7 @@ class TestCalculatorExample < Minitest::Test
     prog = PRATT_PARSER.parse(expr)
 
     assert_equal(want, prog.evaluate(data))
+    assert_equal(want, PrattExample.compile_and_run(prog, data))
   end
 
   def test_simple_literals
