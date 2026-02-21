@@ -88,7 +88,7 @@ Pestle::Grammar::Rule                                  add_sub = { mul_div ~ (ad
                     └── Pestle::Grammar::Identifier    mul_div
 ```
 
-We can also dump arbitrary token pairs for inspections.
+We can also dump arbitrary token pairs for inspection.
 
 ```ruby
 pairs = parser.parse(START_RULE, "1 + 2 * 3!")
@@ -113,7 +113,7 @@ puts pairs.dumps
 
 There's also `Pair#dump` and `Pairs#dump`, which return a more verbose, JSON-like representation of the generated token pairs.
 
-```
+```ruby
 puts JSON.pretty_generate(pairs.dump)
 ```
 
