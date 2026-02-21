@@ -10,6 +10,7 @@ module Pestle::Grammar
       @start = start
       @stop = stop
       @re = /[#{Regexp.escape(start)}-#{Regexp.escape(stop)}]/
+      @s = to_s
     end
 
     def to_s
@@ -18,7 +19,7 @@ module Pestle::Grammar
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       matched = !state.scanner.scan(@re).nil?
-      state.track(to_s, matched)
+      state.track(@s, matched)
       matched
     end
   end

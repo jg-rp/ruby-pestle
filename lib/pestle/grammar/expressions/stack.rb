@@ -61,7 +61,7 @@ module Pestle::Grammar
     end
 
     def to_s
-      "#{tag_s}PEEK[#{@start}..#{stop}]"
+      "#{tag_s}PEEK[#{@start}..#{@stop}]"
     end
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument

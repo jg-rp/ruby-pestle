@@ -16,6 +16,8 @@ module Pestle::Grammar
 
     @re: Regexp
 
+    @s: String
+
     attr_reader value: ::String
 
     def initialize: (::String value, ?tag: ::String?) -> void

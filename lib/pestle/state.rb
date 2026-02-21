@@ -187,7 +187,7 @@ module Pestle
       @atomic_depth = @atomic_depth_checkpoints.pop || raise
     end
 
-    # Record a terminal expression failures for error reporting.
+    # Record terminal expression failures for error reporting.
     def track(label, matched)
       neg_pred_context = @neg_pred_stack.length.odd?
 

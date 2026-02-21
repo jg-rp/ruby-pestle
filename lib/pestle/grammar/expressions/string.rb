@@ -30,6 +30,7 @@ module Pestle::Grammar
       super(tag: tag)
       @value = value
       @re = /#{Regexp.escape(value)}/i
+      @s = to_s
     end
 
     def to_s
@@ -38,7 +39,7 @@ module Pestle::Grammar
 
     def parse(state, pairs) # rubocop: disable Lint/UnusedMethodArgument
       matched = !state.scanner.scan(@re).nil?
-      state.track(to_s, matched)
+      state.track(@s, matched)
       matched
     end
   end

@@ -6,6 +6,8 @@ module Pestle::Grammar
     
     @re: Regexp
 
+    @s: String
+
     attr_reader start: String
 
     attr_reader stop: String
