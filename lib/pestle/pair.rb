@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "JSON"
+require "json"
 
 module Pestle
   # User-facing token stream item. The start or end of a rule.
